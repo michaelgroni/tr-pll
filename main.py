@@ -8,6 +8,8 @@ import time
 import mcp4725
 
 # my stuff
+import internalInput
+import internalOutput
 import userInput
 from display import Display
 from scanner import Scanner
@@ -154,10 +156,10 @@ vfoB = Vfo(144375000, 144375000, subtone.getIndex(), False)
 
 def currentVfo():
     if  not userInput.isPressed(userInput.mrSwitch): # MR not pressed, normal vfo operation
-        if frontInput.abSwitch.value():
-            return vfoA
-        else:
+        if userInput.isPressed(userInput.abSwitch):
             return vfoB
+        else:
+            return vfoA
     else:
         return vfoMemory[userInput.memoryChannel()-1]
     
@@ -185,5 +187,13 @@ userInput.mButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=mHandler)
 
 
 # main loop
+
+internalOutput.setTxForbidden(True)
+internalOutput.initPLL()
+
+frequencyChanged = True # makes the main loop update display and pll
+
+vfo = currentVfo()
+
 while True:
     time.sleep_ms(25)
