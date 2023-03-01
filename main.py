@@ -192,8 +192,64 @@ internalOutput.setTxForbidden(True)
 internalOutput.initPLL()
 
 frequencyChanged = True # makes the main loop update display and pll
+memScanOn = userInput.isPressed(userInput.msSwitch)
+memoryPressed = userInput.isPressed(userInput.mrSwitch)
+oldMemoryChannel = 0
 
 vfo = currentVfo()
 
 while True:
     time.sleep_ms(25)
+    
+    # vfo
+    if not userInput.memoryActive(): # if no memory switch is pressed, the transceiver works in vfo mode
+        if ((vfo is vfoA  and userInput.isPressed(userInput.abSwitch)) or vfo is vfoB and not userInput.isPressed(userInput.abSwitch)): # vfo changed
+            beepOK()
+            time.sleep_ms(_DEBOUNCE_TIME)
+            vfo = currentVfo()
+            frequencyChanged=True
+            subtone.setIndex(currentVfo().getSubtoneIndex())
+            
+    # memory
+    elif not userInput.isPressed(userInput.msSwitch):
+        if memScanOn: # MS button released
+            memScanOn = False
+            beepOK()
+            utime.sleep_ms(_DEBOUNCE_TIME)
+    else:   # MS pressed - memory scan
+        if not memScanOn:
+            memScanOn = True
+            beepOK()
+            utime.sleep_ms(_DEBOUNCE_TIME)
+        txForbidden.value(1)
+        time.sleep_ms(63)   # squelch needs some time to close
+        if squelchOpen.value():
+            utime.sleep_ms(3000)         
+        memoryScanChannel += 1
+        if memoryScanChannel == 7:
+            memoryScanChannel = 1
+        vfo = vfoMemory[memoryScanChannel-1]
+        subtone.setIndex(vfo.getSubtoneIndex())
+        frequencyChanged = True
+      
+    if userInput.isPressed(userInput.mrSwitch) and not memScanOn: # memory scan wins over memory read
+        vfo = currentVfo()
+        
+        if not memoryPressed: # switch position changed
+            memoryPressed = True
+            frequencyChanged = True
+            beepOK()
+        
+        currentChannel = userInput.memoryChannel()
+        if oldMemoryChannel != currentChannel: # memory channel changed
+            oldMemoryChannel = currentChannel
+            subtone.setIndex(vfo.getSubtoneIndex())
+            frequencyChanged = True
+        
+        if (vfo.getRxFrequency() != vfo.getTxFrequency()) and not userInput.isPressed(userInput.pttButton):
+            internalOutput.setTtxForbidden(True)  # no TX allowed as long as PLL ist not configured
+    else: # neither MR nor MS pressed
+         if memoryPressed:
+            memoryPressed = False
+            frequencyChanged = True
+            beepOK()      
