@@ -292,7 +292,7 @@ while True:
         
     # duplex offset
     if not userInput.memoryActive(): # memory channels use their own offset
-        currentDuplexOffset= userInput.duplexOffset()
+        currentDuplexOffset = userInput.duplexOffset()
         if oldDuplexOffset != currentDuplexOffset:
             frequencyChanged = True
             oldDuplexOffset = currentDuplexOffset
@@ -392,14 +392,21 @@ while True:
         # display line 1
         internalOutput.display.setFrequency(currentFrequency)
         
-        
-    # display line 2  
+    
+    # display offset
+    if userInput.memoryActive():
+        internalOutput.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
+    else: # transceiver in vfo mode
+        internalOutput.display.setOffset(currentDuplexOffset)
+    
+    
+    # display line 2
     if userInput.isPressed(userInput.msSwitch):
         internalOutput.display.setLine2("Memory Scan " + str(memoryScanChannel))
     elif userInput.isPressed(userInput.mrSwitch):
         internalOutput.display.setLine2("Memory " + str(userInput.memoryChannel()))
     else:  # no memory operation
-        internalOutput.display.setLine2("Step " + vfo.stepToString())   
+        internalOutput.display.setLine2("Step " + vfo.stepToString())
 
 
     # display line 3
@@ -409,6 +416,3 @@ while True:
         internalOutput.display.setLine3("CTCSS " + "{0:1}".format(subtone.value()))
     else:
         internalOutput.display.setLine3("");
-                                                   
-                                                   
-    time.sleep_ms(25)
