@@ -20,6 +20,9 @@ mrSwitch = machine.Pin(8, machine.Pin.IN, machine.Pin.PULL_UP)            # memo
 msSwitch = machine.Pin(9, machine.Pin.IN, machine.Pin.PULL_UP)            # memory scan
 mButton = machine.Pin(19, machine.Pin.IN, machine.Pin.PULL_UP)            # memory write
 abSwitch = machine.Pin(11, machine.Pin.IN, machine.Pin.PULL_UP)           # 1 = vfoA    0 = pressed = vfoB
+modeSwitch = machine.ADC(27)
+offsetSwitch = machine.ADC(26)
+reverseButton = machine.Pin(18, machine.Pin.IN, machine.Pin.PULL_UP)
 
 # analogue front input
 memoryInput = machine.ADC(28)
@@ -51,3 +54,28 @@ def memoryChannel():
     
 def memoryActive():
     return isPressed(mrSwitch) or isPressed(msSwitch)
+
+def mode():
+    modeAdc = modeSwitch.read_u16()
+    
+    if modeAdc > 40000:   # FM1
+        return 1
+    elif modeAdc > 20000: # FM2
+        return 2
+    elif modeAdc > 13000: # USB or CW
+        return 3
+    else:                 # LSB
+        return 4
+    
+    
+def duplexOffset():
+    duplexAdc = offsetSwitch.read_u16()
+    if mode()<3:  # FM
+        if duplexAdc > 20000:
+            return -600000
+        elif duplexAdc < 10000:
+            return 600000
+        else:
+            return 0
+    else:
+        return 0

@@ -4,14 +4,13 @@ import micropython as mp
 import os
 import time
 
-# stoff form others
-import mcp4725
 
 # my stuff
+import beep
 import internalInput
 import internalOutput
 import userInput
-from display import Display
+from ctcss import ctcss, ctcssMachine
 from scanner import Scanner
 from subtone import Subtone
 from vfo import Vfo
@@ -21,19 +20,6 @@ _DEBOUNCE_TIME = const(120) # milliseconds
 scanner = Scanner()
 subtone = Subtone()
 
-
-#i2c
-sda = machine.Pin(0)
-scl = machine.Pin(1)
-i2c=machine.I2C(0, sda=sda, scl=scl, freq=2000000)
-
-
-# display
-display = Display(i2c)
-
-
-#dac
-dac=mcp4725.MCP4725(i2c, 96)
 
 
 # interrupt handler encoeder button
@@ -54,9 +40,9 @@ def upHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastUp) >= _DEBOUNCE_TIME:
         lastUp = now
-        encoder.up()
+        userInput.encoder.up()
         scanner.setUp(True)
-        mp.schedule(beepOK(), None)
+        mp.schedule(beep.beepOK(), None)
         
 userInput.upButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=upHandler)
 
@@ -71,9 +57,9 @@ def downHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastDown) >= _DEBOUNCE_TIME:
         lastDown = now
-        encoder.down()
+        userInput.encoder.down()
         scanner.setUp(False)
-        mp.schedule(beepOK(), None)
+        mp.schedule(beep.beepOK(), None)
         
 userInput.downButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=downHandler)
 
@@ -169,7 +155,7 @@ def currentVfo():
 
 def mHandler(p):
     if userInput.memoryActive(): # it makes no sense to write a memory channel when the memory ist active
-        mp.schedule(beepEror(), None)
+        mp.schedule(beep.beepError(), None)
         return
     else:
         for i in range(9):
@@ -193,8 +179,14 @@ internalOutput.initPLL()
 
 frequencyChanged = True # makes the main loop update display and pll
 memScanOn = userInput.isPressed(userInput.msSwitch)
+memoryScanChannel = 1  # 1..6
 memoryPressed = userInput.isPressed(userInput.mrSwitch)
+
 oldMemoryChannel = 0
+oldMode = 0
+oldPTTpressed = False
+oldDuplexOffset = 0
+oldReverseMode = 1
 
 vfo = currentVfo()
 
@@ -204,7 +196,7 @@ while True:
     # vfo
     if not userInput.memoryActive(): # if no memory switch is pressed, the transceiver works in vfo mode
         if ((vfo is vfoA  and userInput.isPressed(userInput.abSwitch)) or vfo is vfoB and not userInput.isPressed(userInput.abSwitch)): # vfo changed
-            beepOK()
+            beep.beepOK()
             time.sleep_ms(_DEBOUNCE_TIME)
             vfo = currentVfo()
             frequencyChanged=True
@@ -214,17 +206,17 @@ while True:
     elif not userInput.isPressed(userInput.msSwitch):
         if memScanOn: # MS button released
             memScanOn = False
-            beepOK()
+            beep.beepOK()
             utime.sleep_ms(_DEBOUNCE_TIME)
     else:   # MS pressed - memory scan
         if not memScanOn:
             memScanOn = True
-            beepOK()
-            utime.sleep_ms(_DEBOUNCE_TIME)
-        txForbidden.value(1)
+            beep.beepOK()
+            time.sleep_ms(_DEBOUNCE_TIME)
+        internalOutput.setTxForbidden(True)
         time.sleep_ms(63)   # squelch needs some time to close
-        if squelchOpen.value():
-            utime.sleep_ms(3000)         
+        if internalInput.isSquelchOpen():
+            time.sleep_ms(3000)         
         memoryScanChannel += 1
         if memoryScanChannel == 7:
             memoryScanChannel = 1
@@ -252,4 +244,173 @@ while True:
          if memoryPressed:
             memoryPressed = False
             frequencyChanged = True
-            beepOK()      
+            beep.beepOK()
+        
+        
+    # mode changed?
+    currentMode = userInput.mode()
+    if oldMode != currentMode:
+        beep.beepOK()
+        frequencyChanged = True
+        oldMode = currentMode
+    
+    
+    # ptt changed?        
+    currentPTTpressed = userInput.isPressed(userInput.pttButton)
+    if oldPTTpressed != currentPTTpressed:
+        frequencyChanged = True
+        oldPTTpressed = currentPTTpressed
+    
+    
+    # ctcss subtone
+    if not userInput.memoryActive(): # memory channels use their own subtone
+        vfo.setSubtoneOn(userInput.mode()==1)  # subtone on if mode is FM1
+            
+    if subtone.changed():
+        beep.beepOK()
+        subtone.changeProcessed()
+        ctcssMachine.init(ctcss, freq=int(subtone.value()*180), set_base=machine.Pin(10))
+    
+    if vfo.isSubtoneOn() and not userInput.isPressed(userInput.pttButton):
+        ctcssMachine.active(1)
+    else:
+        ctcssMachine.active(0)
+        
+        
+    # scanner
+    if scanner.isOn() and not userInput.memoryActive():
+        internalOuput.setTxForbidden(True)
+        if internalInput.isSquelchOpen():
+            utime.sleep_ms(4000)
+        if scanner.isUp():
+            vfo.setRxFrequency(vfo.getRxFrequency() + vfo.step())
+        else:
+            vfo.setRxFrequency(vfo.getRxFrequency() - vfo.step())
+        frequencyChanged = True
+        
+        
+    # duplex offset
+    if not userInput.memoryActive(): # memory channels use their own offset
+        currentDuplexOffset= userInput.duplexOffset()
+        if oldDuplexOffset != currentDuplexOffset:
+            frequencyChanged = True
+            oldDuplexOffset = currentDuplexOffset
+            beep.beepOK()
+        if (currentDuplexOffset != 0) and not userInput.isPressed(pttButton):
+            internalOutput.setTxForbidden(True)  # no TX allowed as long as PLL ist not configured
+            
+    
+    # rotary encoder
+    rotaryValue = userInput.encoder.getValue()
+    if rotaryValue != 0:
+        userInput.encoder.reset()
+        if not userInput.memoryActive():
+            if userInput.mode()==1:    # FM1 = FM with subtone
+                subtone.add(rotaryValue)
+                vfo.setSubtoneIndex(subtone.getIndex())
+                beep.beepOK()
+            elif not userInput.isPressed(userInput.pttButton):  # encoder not in ctcss mode and ptt not pressed
+                vfo.setRxFrequency(vfo.getRxFrequency() + rotaryValue*vfo.step())
+                beep.beepOK()
+                frequencyChanged = True
+        else: # memory active
+            beep.beepError()
+
+
+    # reverse button
+    currentReverseMode = userInput.isPressed(userInput.reverseButton)
+    if oldReverseMode != currentReverseMode:
+        frequencyChanged = True
+        beep.beepOK()
+        time.sleep_ms(_DEBOUNCE_TIME)
+        oldReverseMode = currentReverseMode
+        
+    
+    # frequency changed?
+    if frequencyChanged:
+        frequencyChanged = False
+        
+        if not userInput.memoryActive():
+            if vfo.getRxFrequency()<143000000:
+                vfo.setRxFrequency(150000000)
+            elif vfo.getRxFrequency()>150000000:
+                vfo.setRxFrequency(143000000)
+        
+            if vfo.step()==12500:
+                vfo.setRxFrequency(vfo.getRxFrequency() - vfo.getRxFrequency() % 12500)       
+            vfo.setTxFrequency(vfo.getRxFrequency() + currentDuplexOffset)
+        
+        if not userInput.isPressed(userInput.pttButton) and not userInput.isPressed(reverseButton):
+                currentFrequency = vfo.getRxFrequency()
+        else: # ptt pressed or reverse pressed
+            currentFrequency = vfo.getTxFrequency()
+            
+            
+        # PLL
+        internalOutput.setTxForbidden(True)
+        
+        if currentMode == 3:   # USB or CW
+            pllFrequency = currentFrequency + 1500
+        elif currentMode == 4: # LSB
+            pllFrequency = currentFrequency -1500
+        else:
+            pllFrequency = currentFrequency
+            
+        pllFrequency = pllFrequency - 10695000
+        
+        nPll = pllFrequency * 80 / 1000000
+        intPll = int(nPll)
+        fracPll = int(1250 * (nPll-intPll))
+        r0Pll = (intPll << 15) + (fracPll << 3)
+        # R5
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
+        # R4
+        if not userInput.isPressed(userInput.pttButton): 
+            internalOutput.writePLL(spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
+        else:
+            internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
+        # R3
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
+        # R2
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
+        # R1
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
+        # R0
+        internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
+        
+        # tune drive unit and allow tx
+        if vfo.getTxFrequency() >= 144000000 and vfo.getTxFrequency() < 146000000 \
+        and userInput.isPressed(userInput.pttButton) \
+        and not scanner.isOn() \
+        and not userInput.isPressed(userInput.msSwitch) \
+        and not userInput.isPressed(userInput.reverseButton):
+            # dac Vref = 3.3 V
+            dacVoltage = (currentFrequency / 2000000.0) - 70.9
+            dacValue = int(dacVoltage / 3.3 * 4096)
+            internalOutput.dac.write(dacValue)
+            
+            internalOutput.setTxForbidden(False)
+            
+        # display line 1
+        internalOutput.display.setFrequency(currentFrequency)
+        
+        
+    # display line 2  
+    if userInput.isPressed(userInput.msSwitch):
+        internalOutput.display.setLine2("Memory Scan " + str(memoryScanChannel))
+    elif userInput.isPressed(userInput.mrSwitch):
+        internalOutput.display.setLine2("Memory " + str(userInput.memoryChannel()))
+    else:  # no memory operation
+        internalOutput.display.setLine2("Step " + vfo.stepToString())   
+
+
+    # display line 3
+    if scanner.isOn():
+        internalOutput.display.setLine3("Scan")
+    elif vfo.isSubtoneOn() and not userInput.isPressed(userInput.msSwitch):
+        internalOutput.display.setLine3("CTCSS " + "{0:1}".format(subtone.value()))
+    else:
+        internalOutput.display.setLine3("");
+                                                   
+                                                   
+    time.sleep_ms(25)
