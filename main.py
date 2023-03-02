@@ -14,12 +14,14 @@ from ctcss import ctcss, ctcssMachine
 from scanner import Scanner
 from subtone import Subtone
 from vfo import Vfo
+from rotaryEncoder import RotaryEncoder
 
 _DEBOUNCE_TIME = const(120) # milliseconds
 
 scanner = Scanner()
 subtone = Subtone()
 
+encoder = RotaryEncoder(userInput.rotaryClockPin, userInput.rotaryDataPin)
 
 
 # interrupt handler encoeder button
@@ -40,7 +42,7 @@ def upHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastUp) >= _DEBOUNCE_TIME:
         lastUp = now
-        userInput.encoder.up()
+        encoder.up()
         scanner.setUp(True)
         mp.schedule(beep.beepOK(), None)
         
@@ -57,7 +59,7 @@ def downHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastDown) >= _DEBOUNCE_TIME:
         lastDown = now
-        userInput.encoder.down()
+        encoder.down()
         scanner.setUp(False)
         mp.schedule(beep.beepOK(), None)
         
@@ -73,12 +75,12 @@ def stepDecreaseHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastStepDecrease) >= _DEBOUNCE_TIME:
         lastStepDecrease = now
-        if not frontInput.memoryActive():
-            mp.schedule(beepOK(), None)
+        if not userInput.memoryActive():
+            mp.schedule(beep.beepOK(), None)
             vfo.incStep(-1)
             frequencyChanged = True
         else:
-            mp.schedule(beepError(), None)
+            mp.schedule(beep.beepError(), None)
 userInput.stepDecreaseButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=stepDecreaseHandler)
 
 
@@ -91,12 +93,12 @@ def stepIncreaseHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastStepIncrease) >= _DEBOUNCE_TIME:
         lastStepIncrease = now
-        if not frontInput.memoryActive():
-            mp.schedule(beepOK(), None)
+        if not userInput.memoryActive():
+            mp.schedule(beep.beepOK(), None)
             vfo.incStep(1)
             frequencyChanged = True
         else:
-            mp.schedule(beepError(), None)
+            mp.schedule(beep.beepError(), None)
             
 userInput.stepIncreaseButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=stepIncreaseHandler)
 
@@ -159,11 +161,11 @@ def mHandler(p):
         return
     else:
         for i in range(9):
-            utime.sleep_ms(100) # the user has to press the button for some time
-            if frontInput.mButton.value(): # button released too early
-                mp.schedule(beepError(), None)
+            time.sleep_ms(100) # the user has to press the button for some time
+            if not userInput.isPressed(userInput.mButton): # button released too early
+                mp.schedule(beep.beepError(), None)
                 return
-        mp.schedule(beepWriteOK(), None)
+        mp.schedule(beep.beepWriteOK(), None)
         vfoMemory[userInput.memoryChannel()-1] = currentVfo()
         with io.open("memory.csv", mode='w') as csvfile:
             for v in vfoMemory:
@@ -207,7 +209,7 @@ while True:
         if memScanOn: # MS button released
             memScanOn = False
             beep.beepOK()
-            utime.sleep_ms(_DEBOUNCE_TIME)
+            time.sleep_ms(_DEBOUNCE_TIME)
     else:   # MS pressed - memory scan
         if not memScanOn:
             memScanOn = True
@@ -230,7 +232,7 @@ while True:
         if not memoryPressed: # switch position changed
             memoryPressed = True
             frequencyChanged = True
-            beepOK()
+            beep.beepOK()
         
         currentChannel = userInput.memoryChannel()
         if oldMemoryChannel != currentChannel: # memory channel changed
@@ -239,7 +241,7 @@ while True:
             frequencyChanged = True
         
         if (vfo.getRxFrequency() != vfo.getTxFrequency()) and not userInput.isPressed(userInput.pttButton):
-            internalOutput.setTtxForbidden(True)  # no TX allowed as long as PLL ist not configured
+            internalOutput.setTxForbidden(True)  # no TX allowed as long as PLL ist not configured
     else: # neither MR nor MS pressed
          if memoryPressed:
             memoryPressed = False
@@ -267,11 +269,10 @@ while True:
         vfo.setSubtoneOn(userInput.mode()==1)  # subtone on if mode is FM1
             
     if subtone.changed():
-        beep.beepOK()
         subtone.changeProcessed()
         ctcssMachine.init(ctcss, freq=int(subtone.value()*180), set_base=machine.Pin(10))
     
-    if vfo.isSubtoneOn() and not userInput.isPressed(userInput.pttButton):
+    if vfo.isSubtoneOn() and userInput.isPressed(userInput.pttButton):
         ctcssMachine.active(1)
     else:
         ctcssMachine.active(0)
@@ -279,9 +280,9 @@ while True:
         
     # scanner
     if scanner.isOn() and not userInput.memoryActive():
-        internalOuput.setTxForbidden(True)
+        internalOutput.setTxForbidden(True)
         if internalInput.isSquelchOpen():
-            utime.sleep_ms(4000)
+            time.sleep_ms(4000)
         if scanner.isUp():
             vfo.setRxFrequency(vfo.getRxFrequency() + vfo.step())
         else:
@@ -295,23 +296,20 @@ while True:
         if oldDuplexOffset != currentDuplexOffset:
             frequencyChanged = True
             oldDuplexOffset = currentDuplexOffset
-            beep.beepOK()
-        if (currentDuplexOffset != 0) and not userInput.isPressed(pttButton):
+        if (currentDuplexOffset != 0) and not userInput.isPressed(userInput.pttButton):
             internalOutput.setTxForbidden(True)  # no TX allowed as long as PLL ist not configured
             
     
     # rotary encoder
-    rotaryValue = userInput.encoder.getValue()
+    rotaryValue = encoder.getValue()
     if rotaryValue != 0:
-        userInput.encoder.reset()
+        encoder.reset()
         if not userInput.memoryActive():
             if userInput.mode()==1:    # FM1 = FM with subtone
                 subtone.add(rotaryValue)
                 vfo.setSubtoneIndex(subtone.getIndex())
-                beep.beepOK()
             elif not userInput.isPressed(userInput.pttButton):  # encoder not in ctcss mode and ptt not pressed
                 vfo.setRxFrequency(vfo.getRxFrequency() + rotaryValue*vfo.step())
-                beep.beepOK()
                 frequencyChanged = True
         else: # memory active
             beep.beepError()
@@ -340,7 +338,7 @@ while True:
                 vfo.setRxFrequency(vfo.getRxFrequency() - vfo.getRxFrequency() % 12500)       
             vfo.setTxFrequency(vfo.getRxFrequency() + currentDuplexOffset)
         
-        if not userInput.isPressed(userInput.pttButton) and not userInput.isPressed(reverseButton):
+        if not userInput.isPressed(userInput.pttButton) and not userInput.isPressed(userInput.reverseButton):
                 currentFrequency = vfo.getRxFrequency()
         else: # ptt pressed or reverse pressed
             currentFrequency = vfo.getTxFrequency()
@@ -366,7 +364,7 @@ while True:
         internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
         # R4
         if not userInput.isPressed(userInput.pttButton): 
-            internalOutput.writePLL(spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
+            internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
         else:
             internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
         # R3

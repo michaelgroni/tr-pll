@@ -1,11 +1,8 @@
 import machine
 
-from rotaryEncoder import RotaryEncoder
-
 # rotary encoder
 rotaryClockPin = machine.Pin(15, machine.Pin.IN)
 rotaryDataPin = machine.Pin(14, machine.Pin.IN)
-encoder = RotaryEncoder(rotaryClockPin, rotaryDataPin)
 encoderButton = machine.Pin(22, machine.Pin.IN, machine.Pin.PULL_UP)
 
 # mic buttons
@@ -29,10 +26,7 @@ memoryInput = machine.ADC(28)
 
 
 def isPressed(buttonOrSwitch):
-    if buttonOrSwitch is pttButton:
-        return pttButton.value
-    else:
-        return not buttonOrSwitch.value()
+    return buttonOrSwitch.value() == 0
     
 
 def memoryChannel():

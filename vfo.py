@@ -51,7 +51,7 @@ class Vfo:
         return currentStep
             
     def __autoStep(self):
-        if frontInput.mode()<3:      # FM
+        if userInput.mode()<3:      # FM
             return 12500
         else:           # SSB, CW
             return 1000        
