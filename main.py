@@ -246,6 +246,7 @@ while True:
          if memoryPressed:
             memoryPressed = False
             frequencyChanged = True
+            vfo = currentVfo()
             beep.beepOK()
         
         
