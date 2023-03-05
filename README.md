@@ -11,4 +11,4 @@ Modifications for the transceiver Kenwood TR-9130:
 
 ## Installation on a Raspberry Pi Pico
 1. Follow the instructions on https://projects.raspberrypi.org/en/projects/getting-started-with-the-pico to learn how to load the MicroPython firmware and Micropython code on a Raspberry Pi Pico.
-2. Upload all files from this repository that end with .py on the pico. If necessary, adjust the addresses of the display and the digital-to-analogue converter on the I²C bus in the internalOutput.py file before uploading.
+2. Upload all files from this repository that end with .py on the Pico. If necessary, adjust the addresses of the display and the digital-to-analogue converter on the I²C bus in the internalOutput.py file before uploading.
