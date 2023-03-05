@@ -1,5 +1,5 @@
 # tr-pll
-Modifications for the transceiver Kenwood TR-9130:
+## Modifications for the transceiver Kenwood TR-9130
 * new control board with a Raspberry Pi Pico
 * OLED display
 * new PLL with TCXO, step size 10 Hz
