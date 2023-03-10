@@ -8,6 +8,7 @@
 
 ## Circuit diagram with notes in German
 ![circuit](circuit.png)
+![circuit2](circuit2.png)
 
 ## Installation on a Raspberry Pi Pico
 1. Follow the instructions on https://projects.raspberrypi.org/en/projects/getting-started-with-the-pico to learn how to load the MicroPython firmware and Micropython code on a Raspberry Pi Pico.
