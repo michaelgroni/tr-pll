@@ -3,7 +3,7 @@
 * new control board with a Raspberry Pi Pico
 * OLED display
 * new PLL with TCXO, step size 10 Hz
-* send CTCSS
+* CTCSS encoder
 * memory channels without backup battery
 
 ## Circuit diagram with notes in German
