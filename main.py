@@ -155,6 +155,12 @@ def currentVfo():
     
 # interrupt handler M button (write memory)
 
+def saveMemory():
+    with io.open("memory.csv", mode='w') as csvfile:
+        for i in vfoMemory:
+            csvfile.write(i.toCsvString() + "\n")    
+
+
 def mHandler(p):
     if userInput.memoryActive(): # it makes no sense to write a memory channel when the memory ist active
         mp.schedule(beep.beepError(), None)
@@ -166,10 +172,11 @@ def mHandler(p):
                 mp.schedule(beep.beepError(), None)
                 return
         mp.schedule(beep.beepWriteOK(), None)
+        while userInput.isPressed(userInput.mButton): # wait until m-Button is released
+            time.sleep_ms(_DEBOUNCE_TIME)             # TODO improve hardware
         vfoMemory[userInput.memoryChannel()-1] = currentVfo()
-        with io.open("memory.csv", mode='w') as csvfile:
-            for v in vfoMemory:
-                csvfile.write(v.toCsvString() + "\n")
+        mp.schedule(saveMemory(), None)
+
                 
 userInput.mButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=mHandler)
 
