@@ -42,8 +42,8 @@ def upHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastUp) >= _DEBOUNCE_TIME:
         lastUp = now
-        encoder.up()
-        scanner.setUp(True)
+        mp.schedule(encoder.up(), None)
+        mp.schedule(scanner.setUp(True), None)
         mp.schedule(beep.beepOK(), None)
         
 userInput.upButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=upHandler)
@@ -59,8 +59,8 @@ def downHandler(p):
     now = time.ticks_ms()
     if time.ticks_diff(now, lastDown) >= _DEBOUNCE_TIME:
         lastDown = now
-        encoder.down()
-        scanner.setUp(False)
+        mp.schedule(encoder.down(), None)
+        mp.schedule(scanner.setUp(False), None)
         mp.schedule(beep.beepOK(), None)
         
 userInput.downButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=downHandler)
@@ -309,9 +309,8 @@ while True:
             
     
     # rotary encoder
-    rotaryValue = encoder.getValue()
+    rotaryValue = encoder.getValueAndReset()
     if rotaryValue != 0:
-        encoder.reset()
         if not userInput.memoryActive():
             if userInput.mode()==1:    # FM1 = FM with subtone
                 subtone.add(rotaryValue)
