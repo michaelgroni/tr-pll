@@ -1,10 +1,6 @@
 import machine
 import time
 
-# stuff from others
-import mcp4725
-
-from display import Display
 
 # tx forbidden
 
@@ -12,20 +8,6 @@ txForbiddenOutput = machine.Pin(2, machine.Pin.OUT)
 
 def setTxForbidden(on):
     txForbiddenOutput.value(on)
- 
- 
-#i2c
-sda = machine.Pin(0)
-scl = machine.Pin(1)
-i2c=machine.I2C(0, sda=sda, scl=scl, freq=2000000)
-
-
-# display
-display = Display(i2c)
-
-
-# dac (tunes drive unit)
-dac=mcp4725.MCP4725(i2c, 96)
  
  
     

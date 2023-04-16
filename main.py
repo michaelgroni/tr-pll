@@ -9,6 +9,7 @@ import time
 import beep
 import internalInput
 import internalOutput
+import i2c
 import userInput
 from ctcss import ctcss, ctcssMachine
 from scanner import Scanner
@@ -392,34 +393,34 @@ while True:
             # dac Vref = 3.3 V
             dacVoltage = (currentFrequency / 2000000.0) - 70.9
             dacValue = int(dacVoltage / 3.3 * 4096)
-            internalOutput.dac.write(dacValue)
+            i2c.dac.write(dacValue)
             
             internalOutput.setTxForbidden(False)
             
         # display line 1
-        internalOutput.display.setFrequency(currentFrequency)
+        i2c.display.setFrequency(currentFrequency)
         
     
     # display offset
     if userInput.memoryActive():
-        internalOutput.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
+        i2c.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
     else: # transceiver in vfo mode
-        internalOutput.display.setOffset(currentDuplexOffset)
+        i2c.display.setOffset(currentDuplexOffset)
     
     
     # display line 2
     if userInput.isPressed(userInput.msSwitch):
-        internalOutput.display.setLine2("Memory Scan " + str(memoryScanChannel))
+        i2c.display.setLine2("Memory Scan " + str(memoryScanChannel))
     elif userInput.isPressed(userInput.mrSwitch):
-        internalOutput.display.setLine2("Memory " + str(userInput.memoryChannel()))
+        i2c.display.setLine2("Memory " + str(userInput.memoryChannel()))
     else:  # no memory operation
-        internalOutput.display.setLine2("Step " + vfo.stepToString())
+        i2c.display.setLine2("Step " + vfo.stepToString())
 
 
     # display line 3
     if scanner.isOn():
-        internalOutput.display.setLine3("Scan")
+        i2c.display.setLine3("Scan")
     elif vfo.isSubtoneOn() and not userInput.isPressed(userInput.msSwitch):
-        internalOutput.display.setLine3("CTCSS " + "{0:1}".format(subtone.value()))
+        i2c.display.setLine3("CTCSS " + "{0:1}".format(subtone.value()))
     else:
-        internalOutput.display.setLine3("");
+        i2c.display.setLine3("");
