@@ -17,6 +17,9 @@ from subtone import Subtone
 from vfo import Vfo
 from rotaryEncoder import RotaryEncoder
 
+
+i2c.readData()
+
 _DEBOUNCE_TIME = const(120) # milliseconds
 
 scanner = Scanner()
@@ -150,7 +153,7 @@ def currentVfo():
         else:
             return vfoA
     else:
-        return vfoMemory[userInput.memoryChannel()-1]
+        return vfoMemory[i2c.memoryChannel()-1]
     
     
     
@@ -201,7 +204,9 @@ oldReverseMode = 1
 vfo = currentVfo()
 
 while True:
-    time.sleep_ms(25)
+    time.sleep_ms(5)
+    
+    i2c.readData()
     
     # vfo
     if not userInput.memoryActive(): # if no memory switch is pressed, the transceiver works in vfo mode
@@ -242,7 +247,7 @@ while True:
             frequencyChanged = True
             beep.beepOK()
         
-        currentChannel = userInput.memoryChannel()
+        currentChannel = i2c.memoryChannel()
         if oldMemoryChannel != currentChannel: # memory channel changed
             oldMemoryChannel = currentChannel
             subtone.setIndex(vfo.getSubtoneIndex())
@@ -259,7 +264,7 @@ while True:
         
         
     # mode changed?
-    currentMode = userInput.mode()
+    currentMode = i2c.mode()
     if oldMode != currentMode:
         beep.beepOK()
         frequencyChanged = True
@@ -275,7 +280,7 @@ while True:
     
     # ctcss subtone
     if not userInput.memoryActive(): # memory channels use their own subtone
-        vfo.setSubtoneOn(userInput.mode()==1)  # subtone on if mode is FM1
+        vfo.setSubtoneOn(i2c.mode()==1)  # subtone on if mode is FM1
             
     if subtone.changed():
         subtone.changeProcessed()
@@ -301,7 +306,7 @@ while True:
         
     # duplex offset
     if not userInput.memoryActive(): # memory channels use their own offset
-        currentDuplexOffset = userInput.duplexOffset()
+        currentDuplexOffset = i2c.duplexOffset()
         if oldDuplexOffset != currentDuplexOffset:
             frequencyChanged = True
             oldDuplexOffset = currentDuplexOffset
@@ -313,7 +318,7 @@ while True:
     rotaryValue = encoder.getValueAndReset()
     if rotaryValue != 0:
         if not userInput.memoryActive():
-            if userInput.mode()==1:    # FM1 = FM with subtone
+            if i2c.mode()==1:    # FM1 = FM with subtone
                 subtone.add(rotaryValue)
                 vfo.setSubtoneIndex(subtone.getIndex())
             elif not userInput.isPressed(userInput.pttButton):  # encoder not in ctcss mode and ptt not pressed
@@ -412,7 +417,7 @@ while True:
     if userInput.isPressed(userInput.msSwitch):
         i2c.display.setLine2("Memory Scan " + str(memoryScanChannel))
     elif userInput.isPressed(userInput.mrSwitch):
-        i2c.display.setLine2("Memory " + str(userInput.memoryChannel()))
+        i2c.display.setLine2("Memory " + str(i2c.memoryChannel()))
     else:  # no memory operation
         i2c.display.setLine2("Step " + vfo.stepToString())
 

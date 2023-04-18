@@ -1,7 +1,7 @@
 import machine
 import _thread
 
-import userInput
+import i2c
 
 class Vfo:
     # frequency step
@@ -51,7 +51,7 @@ class Vfo:
         return currentStep
             
     def __autoStep(self):
-        if userInput.mode()<3:      # FM
+        if i2c.mode()<3:      # FM
             return 12500
         else:           # SSB, CW
             return 1000        
