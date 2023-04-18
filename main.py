@@ -71,7 +71,6 @@ userInput.downButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=downHandler)
 
 
 # interrupt handler scan button, used as stepDecrease
-
 lastStepDecrease = 0 # timestamp for debouncing
 
 def stepDecreaseHandler(p):
@@ -83,6 +82,7 @@ def stepDecreaseHandler(p):
             mp.schedule(beep.beepOK(), None)
             vfo.incStep(-1)
             frequencyChanged = True
+            stepChanged = True
         else:
             mp.schedule(beep.beepError(), None)
 userInput.stepDecreaseButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=stepDecreaseHandler)
@@ -101,6 +101,7 @@ def stepIncreaseHandler(p):
             mp.schedule(beep.beepOK(), None)
             vfo.incStep(1)
             frequencyChanged = True
+            stepChanged = True
         else:
             mp.schedule(beep.beepError(), None)
             
@@ -204,7 +205,6 @@ oldReverseMode = 1
 vfo = currentVfo()
 
 while True:
-    time.sleep_ms(5)
     
     i2c.readData()
     
@@ -373,19 +373,11 @@ while True:
         intPll = int(nPll)
         fracPll = int(1250 * (nPll-intPll))
         r0Pll = (intPll << 15) + (fracPll << 3)
-        # R5
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
         # R4
         if not userInput.isPressed(userInput.pttButton): 
             internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
         else:
             internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
-        # R3
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
-        # R2
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
-        # R1
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
         # R0
         internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
         
@@ -406,11 +398,11 @@ while True:
         i2c.display.setFrequency(currentFrequency)
         
     
-    # display offset
-    if userInput.memoryActive():
-        i2c.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
-    else: # transceiver in vfo mode
-        i2c.display.setOffset(currentDuplexOffset)
+        # display offset
+        if userInput.memoryActive():
+            i2c.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
+        else: # transceiver in vfo mode
+            i2c.display.setOffset(currentDuplexOffset)
     
     
     # display line 2
@@ -418,9 +410,8 @@ while True:
         i2c.display.setLine2("Memory Scan " + str(memoryScanChannel))
     elif userInput.isPressed(userInput.mrSwitch):
         i2c.display.setLine2("Memory " + str(i2c.memoryChannel()))
-    else:  # no memory operation
+    else:
         i2c.display.setLine2("Step " + vfo.stepToString())
-
 
     # display line 3
     if scanner.isOn():

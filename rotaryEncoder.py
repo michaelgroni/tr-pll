@@ -15,13 +15,9 @@ class RotaryEncoder:
         self.__dataPin = dataPin
         
         self.__valueLock = _thread.allocate_lock()
-        self.__encoderLock = _thread.allocate_lock()
-
         
-        clockPin.irq(trigger=machine.Pin.IRQ_FALLING, handler=self.__encoderClockHandler)
-        clockPin.irq(trigger=machine.Pin.IRQ_RISING, handler=self.__encoderClockHandler)
-        dataPin.irq(trigger=machine.Pin.IRQ_FALLING, handler=self.__encoderDataHandler)
-        dataPin.irq(trigger=machine.Pin.IRQ_RISING, handler=self.__encoderDataHandler)
+        clockPin.irq(trigger=machine.Pin.IRQ_FALLING | machine.Pin.IRQ_RISING, handler=self.__encoderHandler)
+        dataPin.irq(trigger=machine.Pin.IRQ_FALLING | machine.Pin.IRQ_RISING, handler=self.__encoderHandler)
  
         # 2-Bit-Gray-Code
         # 0 0   0 -> change value
@@ -29,23 +25,15 @@ class RotaryEncoder:
         # 1 1   2 -> change value
         # 1 0   3
         
-    def __encoderClockHandler(self, p): # encoder up
-        if self.__encoderLock.acquire(0):
-            newState = self.__currentState()
-            if (self.__state==3 and newState==0) or (self.__state==1 and newState==2):
-                mp.schedule(self.up(), None)
-            self.__state = newState
-        self.__encoderLock.release()
-
-
-
-    def __encoderDataHandler(self, p): # encoder down
-        if self.__encoderLock.acquire(0):
-            newState = self.__currentState()
-            if (self.__state==1 and newState==0) or (self.__state==3 and newState==2):
-                mp.schedule(self.down(), None)
-            self.__state = newState
-        self.__encoderLock.release()
+    def __encoderHandler(self, p):
+        irqState = machine.disable_irq()
+        newState = self.__currentState()
+        if (self.__state==3 and newState==0) or (self.__state==1 and newState==2):
+            self.up()
+        elif (self.__state==1 and newState==0) or (self.__state==3 and newState==2):
+            self.down()
+        self.__state = newState
+        machine.enable_irq(irqState)
   
                     
     def __currentState(self):
