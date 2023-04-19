@@ -7,7 +7,7 @@
 * memory channels without backup battery
 
 ## Circuit diagram with notes in German
-![circuit](circuit.png)
+Circuit v2 coming soon.
 ![circuit2](circuit2.png)
 
 ## Installation on a Raspberry Pi Pico
