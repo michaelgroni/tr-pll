@@ -104,7 +104,6 @@ def stepIncreaseHandler(p):
             stepChanged = True
         else:
             mp.schedule(beep.beepError(), None)
-            
 userInput.stepIncreaseButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=stepIncreaseHandler)
 
 
@@ -202,9 +201,13 @@ oldPTTpressed = False
 oldDuplexOffset = 0
 oldReverseMode = 1
 
+currentMode = -1
+
 vfo = currentVfo()
 
 while True:
+    
+    time.sleep_ms(1)
     
     i2c.readData()
     
@@ -359,11 +362,12 @@ while True:
             
         # PLL
         internalOutput.setTxForbidden(True)
+
         
         if currentMode == 3:   # USB or CW
             pllFrequency = currentFrequency + 1500
         elif currentMode == 4: # LSB
-            pllFrequency = currentFrequency -1500
+            pllFrequency = currentFrequency - 1500
         else:
             pllFrequency = currentFrequency
             
@@ -373,11 +377,19 @@ while True:
         intPll = int(nPll)
         fracPll = int(1250 * (nPll-intPll))
         r0Pll = (intPll << 15) + (fracPll << 3)
+        # R5
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
         # R4
         if not userInput.isPressed(userInput.pttButton): 
             internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
         else:
             internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
+        # R3
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
+        # R2
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
+        # R1
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
         # R0
         internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
         
