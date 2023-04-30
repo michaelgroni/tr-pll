@@ -1,13 +1,13 @@
 import machine
 
 # rotary encoder
-rotaryClockPin = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
-rotaryDataPin = machine.Pin(14, machine.Pin.IN, machine.Pin.PULL_UP)
+rotaryClockPin = machine.Pin(14, machine.Pin.IN, machine.Pin.PULL_UP)
+rotaryDataPin = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP)
 encoderButton = machine.Pin(22, machine.Pin.IN, machine.Pin.PULL_UP)
 
 # mic buttons
-upButton = machine.Pin(13, machine.Pin.IN, machine.Pin.PULL_UP)
-downButton = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP)
+upButton = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP)
+downButton = machine.Pin(13, machine.Pin.IN, machine.Pin.PULL_UP)
 pttButton = machine.Pin(20, machine.Pin.IN)
 
 # front buttons and switches

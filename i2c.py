@@ -5,9 +5,9 @@ import mcp4725
 from display import Display
 
 
-sda = machine.Pin(0, pull=machine.Pin.PULL_UP)
-scl = machine.Pin(1, pull=machine.Pin.PULL_UP)
-i2c=machine.I2C(0, sda=sda, scl=scl, freq=400000) # PCF8574 fmax = 100 kHz
+sda = machine.Pin(0, mode=machine.Pin.ALT, pull=machine.Pin.PULL_UP)
+scl = machine.Pin(1, mode=machine.Pin.ALT, pull=machine.Pin.PULL_UP)
+i2c=machine.I2C(0, sda=sda, scl=scl, freq=200000) # PCF8574 fmax = 100 kHz
 
 
 # display

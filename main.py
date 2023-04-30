@@ -22,10 +22,11 @@ i2c.readData()
 
 _DEBOUNCE_TIME = const(200) # milliseconds
 
+
 scanner = Scanner()
 subtone = Subtone()
 
-encoder = RotaryEncoder(userInput.rotaryDataPin, userInput.rotaryClockPin)
+encoder = RotaryEncoder(userInput.rotaryClockPin, userInput.rotaryDataPin)
 
 
 # interrupt handler encoeder button
@@ -44,7 +45,7 @@ lastUp = 0 # timestamp for debouncing
 def upHandler(p):
     global lastUp
     now = time.ticks_ms()
-    if time.ticks_diff(now, lastUp) >= _DEBOUNCE_TIME:
+    if time.ticks_diff(now, lastUp) >= _DEBOUNCE_TIME and userInput.upButton.value()==0:
         lastUp = now
         mp.schedule(encoder.up(), None)
         mp.schedule(scanner.setUp(True), None)
@@ -61,7 +62,7 @@ lastDown = 0 # timestamp for debouncing
 def downHandler(p):
     global lastDown
     now = time.ticks_ms()
-    if time.ticks_diff(now, lastDown) >= _DEBOUNCE_TIME:
+    if time.ticks_diff(now, lastDown) >= _DEBOUNCE_TIME and userInput.downButton.value()==0:
         lastDown = now
         mp.schedule(encoder.down(), None)
         mp.schedule(scanner.setUp(False), None)
@@ -76,7 +77,7 @@ lastStepDecrease = 0 # timestamp for debouncing
 def stepDecreaseHandler(p):
     global frequencyChanged, lastStepDecrease
     now = time.ticks_ms()
-    if time.ticks_diff(now, lastStepDecrease) >= _DEBOUNCE_TIME:
+    if time.ticks_diff(now, lastStepDecrease) >= _DEBOUNCE_TIME and userInput.stepDecreaseButton.value()==0:
         lastStepDecrease = now
         if not userInput.memoryActive():
             mp.schedule(beep.beepOK(), None)
@@ -95,7 +96,7 @@ lastStepIncrease = 0 # timestamp for debouncing
 def stepIncreaseHandler(p):
     global frequencyChanged, lastStepIncrease
     now = time.ticks_ms()
-    if time.ticks_diff(now, lastStepIncrease) >= _DEBOUNCE_TIME:
+    if time.ticks_diff(now, lastStepIncrease) >= _DEBOUNCE_TIME and userInput.stepIncreaseButton.value()==0:
         lastStepIncrease = now
         if not userInput.memoryActive():
             mp.schedule(beep.beepOK(), None)
@@ -109,7 +110,8 @@ userInput.stepIncreaseButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=stepIn
 
 # interrupt handler ptt button
 def pttHandler(p):
-    scanner.setOn(False)
+    if userInput.pttButton.value()==0:
+        scanner.setOn(False)
     
 userInput.pttButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=pttHandler)
 
@@ -165,21 +167,27 @@ def saveMemory():
             csvfile.write(i.toCsvString() + "\n")    
 
 
+lastM = 0 # timestamp for debouncing
+
 def mHandler(p):
-    if userInput.memoryActive(): # it makes no sense to write a memory channel when the memory ist active
-        mp.schedule(beep.beepError(), None)
-        return
-    else:
-        for i in range(9):
-            time.sleep_ms(100) # the user has to press the button for some time
-            if not userInput.isPressed(userInput.mButton): # button released too early
-                mp.schedule(beep.beepError(), None)
-                return
-        mp.schedule(beep.beepWriteOK(), None)
-        while userInput.isPressed(userInput.mButton): # wait until m-Button is released
-            time.sleep_ms(_DEBOUNCE_TIME)             # TODO improve hardware
-        vfoMemory[userInput.memoryChannel()-1] = currentVfo()
-        mp.schedule(saveMemory(), None)
+    global lastM
+    now = time.ticks_ms()
+    if time.ticks_diff(now, lastM) >= _DEBOUNCE_TIME and userInput.mButton.value()==0:
+        lastM = now
+        if userInput.memoryActive(): # it makes no sense to write a memory channel when the memory ist active
+            mp.schedule(beep.beepError(), None)
+            return
+        else:
+            for i in range(9):
+                time.sleep_ms(100) # the user has to press the button for some time
+                if not userInput.isPressed(userInput.mButton): # button released too early
+                    mp.schedule(beep.beepError(), None)
+                    return
+            mp.schedule(beep.beepWriteOK(), None)
+            while userInput.isPressed(userInput.mButton): # wait until m-Button is released
+                time.sleep_ms(_DEBOUNCE_TIME)             # TODO improve hardware
+            vfoMemory[userInput.memoryChannel()-1] = currentVfo()
+            mp.schedule(saveMemory(), None)
 
                 
 userInput.mButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=mHandler)
