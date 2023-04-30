@@ -20,12 +20,12 @@ from rotaryEncoder import RotaryEncoder
 
 i2c.readData()
 
-_DEBOUNCE_TIME = const(120) # milliseconds
+_DEBOUNCE_TIME = const(200) # milliseconds
 
 scanner = Scanner()
 subtone = Subtone()
 
-encoder = RotaryEncoder(userInput.rotaryClockPin, userInput.rotaryDataPin)
+encoder = RotaryEncoder(userInput.rotaryDataPin, userInput.rotaryClockPin)
 
 
 # interrupt handler encoeder button
