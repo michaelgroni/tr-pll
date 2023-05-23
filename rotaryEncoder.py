@@ -1,6 +1,4 @@
 import machine
-import time
-import micropython as mp
 
 class RotaryEncoder:
 
