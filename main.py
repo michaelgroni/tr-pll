@@ -24,7 +24,7 @@ subtone = Subtone()
 encoder = RotaryEncoder(userInput.rotaryClockPin, userInput.rotaryDataPin)
 
 
-# interrupt handler encoeder button
+# interrupt handler encoder button
 
 def encoderButtonHandler(p): # toggle scanner
     scanner.setOn(not scanner.isOn())
