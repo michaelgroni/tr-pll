@@ -8,10 +8,10 @@
 
 ## Circuit diagrams with notes in German
 ### CONTROL UNIT
-![CONTROL UNIT](CONTROL UNIT v2.2.TIF)
+![CONTROL UNIT]("CONTROL UNIT v2.2.TIF")
 
 ### PLL UNIT
-![PLL UNIT](PLL UNIT.png)
+![PLL UNIT]("PLL UNIT.png")
 
 ### OPTIONAL (notes in German)
 ![OPTIONAL](circuit2.png)
