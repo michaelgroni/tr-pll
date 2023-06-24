@@ -6,9 +6,15 @@
 * CTCSS encoder
 * memory channels without backup battery
 
-## Circuit diagram with notes in German
-Circuit v2 coming soon.
-![circuit2](circuit2.png)
+## Circuit diagrams with notes in German
+### CONTROL UNIT
+![CONTROL UNIT](CONTROL UNIT v2.2.TIF)
+
+### PLL UNIT
+![PLL UNIT](PLL UNIT.png)
+
+### OPTIONAL (notes in German)
+![OPTIONAL](circuit2.png)
 
 ## Installation on a Raspberry Pi Pico
 1. Follow the instructions on https://projects.raspberrypi.org/en/projects/getting-started-with-the-pico to learn how to load the MicroPython firmware and Micropython code on a Raspberry Pi Pico.
