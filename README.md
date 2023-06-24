@@ -11,7 +11,7 @@
 ![CONTROL UNIT]("CONTROL UNIT v2.2.TIF")
 
 ### PLL UNIT
-![PLL UNIT]("PLL UNIT.png")
+![PLL UNIT](PLL.png)
 
 ### OPTIONAL (notes in German)
 ![OPTIONAL](circuit2.png)
