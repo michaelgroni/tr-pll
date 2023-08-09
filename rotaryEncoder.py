@@ -1,4 +1,8 @@
 import machine
+import time
+import micropython as mp
+
+_ROTARY_DEBOUNCE_TIME = const(150) # milliseconds
 
 class RotaryEncoder:
 

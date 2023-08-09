@@ -18,7 +18,6 @@ from vfo import Vfo
 from rotaryEncoder import RotaryEncoder
 
 
-i2c.readData()
 
 _DEBOUNCE_TIME = const(200) # milliseconds
 
@@ -31,9 +30,15 @@ encoder = RotaryEncoder(userInput.rotaryClockPin, userInput.rotaryDataPin)
 
 # interrupt handler encoeder button
 
-def encoderButtonHandler(p): # toggle scanner
-    scanner.setOn(not scanner.isOn())
+lastEncPress = 0 # timestamp for debouncing
 
+def encoderButtonHandler(p): # toggle scanner
+    global lastEncPress
+    now = time.ticks_ms()
+    if time.ticks_diff(now, lastEncPress) >= _DEBOUNCE_TIME and userInput.isPressed(userInput.encoderButton):
+        lastEncPress = now
+        scanner.setOn(not scanner.isOn())
+        
 userInput.encoderButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=encoderButtonHandler)
 
 
@@ -214,7 +219,6 @@ currentMode = -1
 vfo = currentVfo()
 
 while True:
-    
     time.sleep_ms(1)
     
     i2c.readData()
