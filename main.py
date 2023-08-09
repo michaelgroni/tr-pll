@@ -21,6 +21,7 @@ from rotaryEncoder import RotaryEncoder
 
 _DEBOUNCE_TIME = const(200) # milliseconds
 
+i2c.readData() # Do not delete!
 
 scanner = Scanner()
 subtone = Subtone()
