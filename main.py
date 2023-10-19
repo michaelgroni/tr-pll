@@ -21,7 +21,7 @@ from rotaryEncoder import RotaryEncoder
 
 _DEBOUNCE_TIME = const(200) # milliseconds
 
-i2c.readData() # Do not delete!
+i2c.readData() # init
 
 scanner = Scanner()
 subtone = Subtone()
@@ -176,9 +176,9 @@ def saveMemory():
 lastM = 0 # timestamp for debouncing
 
 def mHandler(p):
-    global lastM
+    global lastM, vfoMemory
     now = time.ticks_ms()
-    if time.ticks_diff(now, lastM) >= _DEBOUNCE_TIME and userInput.mButton.value()==0:
+    if time.ticks_diff(now, lastM) >= _DEBOUNCE_TIME and userInput.isPressed(userInput.mButton):
         lastM = now
         if userInput.memoryActive(): # it makes no sense to write a memory channel when the memory ist active
             mp.schedule(beep.beepError(), None)
@@ -192,7 +192,7 @@ def mHandler(p):
             mp.schedule(beep.beepWriteOK(), None)
             while userInput.isPressed(userInput.mButton): # wait until m-Button is released
                 time.sleep_ms(_DEBOUNCE_TIME)             # TODO improve hardware
-            vfoMemory[userInput.memoryChannel()-1] = currentVfo()
+            vfoMemory[i2c.memoryChannel()-1] = currentVfo()
             mp.schedule(saveMemory(), None)
 
                 
@@ -281,10 +281,13 @@ while True:
         
     # mode changed?
     currentMode = i2c.mode()
+    if currentMode == 3: # mode is USB/CW or switch is being moved at the moment
+        time.sleep_ms(_DEBOUNCE_TIME)
+        i2c.readData()
+        currentMode = i2c.mode()
+        
     if oldMode != currentMode:
-        beep.beepOK()
         frequencyChanged = True
-        oldMode = currentMode
     
     
     # ptt changed?        
