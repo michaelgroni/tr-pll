@@ -81,14 +81,13 @@ userInput.downButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=downHandler)
 lastStepDecrease = 0 # timestamp for debouncing
 
 def stepDecreaseHandler(p):
-    global frequencyChanged, lastStepDecrease
+    global lastStepDecrease
     now = time.ticks_ms()
     if time.ticks_diff(now, lastStepDecrease) >= _DEBOUNCE_TIME and userInput.stepDecreaseButton.value()==0:
         lastStepDecrease = now
         if not userInput.memoryActive():
             mp.schedule(beep.beepOK(), None)
             vfo.incStep(-1)
-            frequencyChanged = True
             stepChanged = True
         else:
             mp.schedule(beep.beepError(), None)
@@ -100,14 +99,13 @@ userInput.stepDecreaseButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=stepDe
 lastStepIncrease = 0 # timestamp for debouncing
 
 def stepIncreaseHandler(p):
-    global frequencyChanged, lastStepIncrease
+    global lastStepIncrease
     now = time.ticks_ms()
     if time.ticks_diff(now, lastStepIncrease) >= _DEBOUNCE_TIME and userInput.stepIncreaseButton.value()==0:
         lastStepIncrease = now
         if not userInput.memoryActive():
             mp.schedule(beep.beepOK(), None)
             vfo.incStep(1)
-            frequencyChanged = True
             stepChanged = True
         else:
             mp.schedule(beep.beepError(), None)
@@ -191,7 +189,7 @@ def mHandler(p):
                     return
             mp.schedule(beep.beepWriteOK(), None)
             while userInput.isPressed(userInput.mButton): # wait until m-Button is released
-                time.sleep_ms(_DEBOUNCE_TIME)             # TODO improve hardware
+                time.sleep_ms(_DEBOUNCE_TIME)             
             vfoMemory[i2c.memoryChannel()-1] = currentVfo()
             mp.schedule(saveMemory(), None)
 
@@ -204,7 +202,6 @@ userInput.mButton.irq(trigger=machine.Pin.IRQ_FALLING, handler=mHandler)
 internalOutput.setTxForbidden(True)
 internalOutput.initPLL()
 
-frequencyChanged = True # makes the main loop update display and pll
 memScanOn = userInput.isPressed(userInput.msSwitch)
 memoryScanChannel = 1  # 1..6
 memoryPressed = userInput.isPressed(userInput.mrSwitch)
@@ -230,7 +227,6 @@ while True:
             beep.beepOK()
             time.sleep_ms(_DEBOUNCE_TIME)
             vfo = currentVfo()
-            frequencyChanged=True
             subtone.setIndex(currentVfo().getSubtoneIndex())
             
     # memory
@@ -253,28 +249,24 @@ while True:
             memoryScanChannel = 1
         vfo = vfoMemory[memoryScanChannel-1]
         subtone.setIndex(vfo.getSubtoneIndex())
-        frequencyChanged = True
       
     if userInput.isPressed(userInput.mrSwitch) and not memScanOn: # memory scan wins over memory read
         vfo = currentVfo()
         
         if not memoryPressed: # switch position changed
             memoryPressed = True
-            frequencyChanged = True
             beep.beepOK()
         
         currentChannel = i2c.memoryChannel()
         if oldMemoryChannel != currentChannel: # memory channel changed
             oldMemoryChannel = currentChannel
             subtone.setIndex(vfo.getSubtoneIndex())
-            frequencyChanged = True
         
         if (vfo.getRxFrequency() != vfo.getTxFrequency()) and not userInput.isPressed(userInput.pttButton):
             internalOutput.setTxForbidden(True)  # no TX allowed as long as PLL ist not configured
     else: # neither MR nor MS pressed
          if memoryPressed:
             memoryPressed = False
-            frequencyChanged = True
             vfo = currentVfo()
             beep.beepOK()
         
@@ -285,15 +277,11 @@ while True:
         time.sleep_ms(_DEBOUNCE_TIME)
         i2c.readData()
         currentMode = i2c.mode()
-        
-    if oldMode != currentMode:
-        frequencyChanged = True
     
     
     # ptt changed?        
     currentPTTpressed = userInput.isPressed(userInput.pttButton)
     if oldPTTpressed != currentPTTpressed:
-        frequencyChanged = True
         oldPTTpressed = currentPTTpressed
     
     
@@ -320,14 +308,12 @@ while True:
             vfo.setRxFrequency(vfo.getRxFrequency() + vfo.step())
         else:
             vfo.setRxFrequency(vfo.getRxFrequency() - vfo.step())
-        frequencyChanged = True
         
         
     # duplex offset
     if not userInput.memoryActive(): # memory channels use their own offset
         currentDuplexOffset = i2c.duplexOffset()
         if oldDuplexOffset != currentDuplexOffset:
-            frequencyChanged = True
             oldDuplexOffset = currentDuplexOffset
         if (currentDuplexOffset != 0) and not userInput.isPressed(userInput.pttButton):
             internalOutput.setTxForbidden(True)  # no TX allowed as long as PLL ist not configured
@@ -342,7 +328,6 @@ while True:
                 vfo.setSubtoneIndex(subtone.getIndex())
             elif not userInput.isPressed(userInput.pttButton):  # encoder not in ctcss mode and ptt not pressed
                 vfo.setRxFrequency(vfo.getRxFrequency() + rotaryValue*vfo.step())
-                frequencyChanged = True
         else: # memory active
             beep.beepError()
 
@@ -350,87 +335,84 @@ while True:
     # reverse button
     currentReverseMode = userInput.isPressed(userInput.reverseButton)
     if oldReverseMode != currentReverseMode:
-        frequencyChanged = True
         beep.beepOK()
         time.sleep_ms(_DEBOUNCE_TIME)
         oldReverseMode = currentReverseMode
         
     
-    # frequency changed?
-    if frequencyChanged:
-        frequencyChanged = False
-        
-        if not userInput.memoryActive():
-            if vfo.getRxFrequency()<143000000:
-                vfo.setRxFrequency(150000000)
-            elif vfo.getRxFrequency()>150000000:
-                vfo.setRxFrequency(143000000)
-        
-            if vfo.step()==12500:
-                vfo.setRxFrequency(vfo.getRxFrequency() - vfo.getRxFrequency() % 12500)       
-            vfo.setTxFrequency(vfo.getRxFrequency() + currentDuplexOffset)
-        
-        if not userInput.isPressed(userInput.pttButton) and not userInput.isPressed(userInput.reverseButton):
-                currentFrequency = vfo.getRxFrequency()
-        else: # ptt pressed or reverse pressed
-            currentFrequency = vfo.getTxFrequency()
-            
-            
-        # PLL
-        internalOutput.setTxForbidden(True)
 
         
-        if currentMode == 3:   # USB or CW
-            pllFrequency = currentFrequency + 1500
-        elif currentMode == 4: # LSB
-            pllFrequency = currentFrequency - 1500
-        else:
-            pllFrequency = currentFrequency
-            
-        pllFrequency = pllFrequency - 10695000
-        
-        nPll = pllFrequency * 80 / 1000000
-        intPll = int(nPll)
-        fracPll = int(1250 * (nPll-intPll))
-        r0Pll = (intPll << 15) + (fracPll << 3)
-        # R5
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
-        # R4
-        if not userInput.isPressed(userInput.pttButton): 
-            internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
-        else:
-            internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
-        # R3
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
-        # R2
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
-        # R1
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
-        # R0
-        internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
-        
-        # tune drive unit and allow tx
-        if vfo.getTxFrequency() >= 144000000 and vfo.getTxFrequency() < 146000000 \
-        and userInput.isPressed(userInput.pttButton) \
-        and not scanner.isOn() \
-        and not userInput.isPressed(userInput.msSwitch) \
-        and not userInput.isPressed(userInput.reverseButton):
-            # dac Vref = 3.3 V
-            dacVoltage = (currentFrequency / 2000000.0) - 70.9
-            dacValue = int(dacVoltage / 3.3 * 4096)
-            i2c.dac.write(dacValue)
-            
-            internalOutput.setTxForbidden(False)
-            
-        # display line 1
-        i2c.display.setFrequency(currentFrequency)
-        
+    if not userInput.memoryActive():
+        if vfo.getRxFrequency()<143000000:
+            vfo.setRxFrequency(150000000)
+        elif vfo.getRxFrequency()>150000000:
+            vfo.setRxFrequency(143000000)
     
-        # display offset
-        if userInput.memoryActive():
-            i2c.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
-        else: # transceiver in vfo mode
-            i2c.display.setOffset(currentDuplexOffset)
+        if vfo.step()==12500:
+            vfo.setRxFrequency(vfo.getRxFrequency() - vfo.getRxFrequency() % 12500)       
+        vfo.setTxFrequency(vfo.getRxFrequency() + currentDuplexOffset)
+    
+    if not userInput.isPressed(userInput.pttButton) and not userInput.isPressed(userInput.reverseButton):
+        currentFrequency = vfo.getRxFrequency()
+    else: # ptt pressed or reverse pressed
+        currentFrequency = vfo.getTxFrequency()
+        
+        
+    # PLL
+    internalOutput.setTxForbidden(True)
+
+    
+    if currentMode == 3:   # USB or CW
+        pllFrequency = currentFrequency + 1500
+    elif currentMode == 4: # LSB
+        pllFrequency = currentFrequency - 1500
+    else:
+        pllFrequency = currentFrequency
+        
+    pllFrequency = pllFrequency - 10695000
+    
+    nPll = pllFrequency * 80 / 1000000
+    intPll = int(nPll)
+    fracPll = int(1250 * (nPll-intPll))
+    r0Pll = (intPll << 15) + (fracPll << 3)
+    # R5
+    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
+    # R4
+    if not userInput.isPressed(userInput.pttButton): 
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
+    else:
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
+    # R3
+    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
+    # R2
+    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
+    # R1
+    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
+    # R0
+    internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
+    
+    # tune drive unit and allow tx
+    if vfo.getTxFrequency() >= 144000000 and vfo.getTxFrequency() < 146000000 \
+    and userInput.isPressed(userInput.pttButton) \
+    and not scanner.isOn() \
+    and not userInput.isPressed(userInput.msSwitch) \
+    and not userInput.isPressed(userInput.reverseButton):
+        # dac Vref = 3.3 V
+        dacVoltage = (currentFrequency / 2000000.0) - 70.9
+        dacValue = int(dacVoltage / 3.3 * 4096)
+        i2c.dac.write(dacValue)
+        
+        internalOutput.setTxForbidden(False)
+        
+    # display line 1
+    i2c.display.setFrequency(currentFrequency)
+    
+
+    # display offset
+    if userInput.memoryActive():
+        i2c.display.setOffset(vfo.getTxFrequency() - vfo.getRxFrequency())
+    else: # transceiver in vfo mode
+        i2c.display.setOffset(currentDuplexOffset)
     
     
     # display line 2

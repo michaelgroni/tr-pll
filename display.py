@@ -35,16 +35,15 @@ class Display:
         
     
     def setOffset(self, offset):
-        if self.__oldOffset != offset:
-            self.__oled.fill_rect(120, 0, 127, 15, 0)  # overwrite old content
-            offsetString = " "
-            if offset > 0:
-                offsetString = "+"
-            elif offset < 0:
-                offsetString = "-"
-            self.__oled.text(offsetString, 120, 4)
-            self.__oled.show()
-            self.__oldOffset = offset
+        self.__oled.fill_rect(120, 0, 127, 15, 0)  # overwrite old content
+        offsetString = " "
+        if offset > 0:
+            offsetString = "+"
+        elif offset < 0:
+            offsetString = "-"
+        self.__oled.text(offsetString, 120, 4)
+        self.__oled.show()
+        self.__oldOffset = offset
     
     def setLine2(self, s):
         if s != self.__oldLine2:
