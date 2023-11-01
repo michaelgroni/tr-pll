@@ -211,6 +211,7 @@ oldMode = 0
 oldPTTpressed = False
 oldDuplexOffset = 0
 oldReverseMode = 1
+oldPllFrequency = 0
 
 currentMode = -1
 
@@ -371,37 +372,41 @@ while True:
         
     pllFrequency = pllFrequency - 10695000
     
-    nPll = pllFrequency * 80 / 1000000
-    intPll = int(nPll)
-    fracPll = int(1250 * (nPll-intPll))
-    r0Pll = (intPll << 15) + (fracPll << 3)
-    # R5
-    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
-    # R4
-    if not userInput.isPressed(userInput.pttButton): 
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
-    else:
-        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
-    # R3
-    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
-    # R2
-    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
-    # R1
-    internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
-    # R0
-    internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
+    if pllFrequency != oldPllFrequency:
+        oldPllFrequency = pllFrequency
     
-    # tune drive unit and allow tx
-    if vfo.getTxFrequency() >= 144000000 and vfo.getTxFrequency() < 146000000 \
-    and userInput.isPressed(userInput.pttButton) \
-    and not scanner.isOn() \
-    and not userInput.isPressed(userInput.msSwitch) \
-    and not userInput.isPressed(userInput.reverseButton):
-        # dac Vref = 3.3 V
-        dacVoltage = (currentFrequency / 2000000.0) - 70.9
-        dacValue = int(dacVoltage / 3.3 * 4096)
-        i2c.dac.write(dacValue)
+        nPll = pllFrequency * 80 / 1000000
+        intPll = int(nPll)
+        fracPll = int(1250 * (nPll-intPll))
+        r0Pll = (intPll << 15) + (fracPll << 3)
+        # R5
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x58\x00\x05'))
+        # R4
+        if not userInput.isPressed(userInput.pttButton): 
+            internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x3C')) # more power from PLL in RX mode
+        else:
+            internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\xD0\x14\x34'))
+        # R3
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x80\x04\xB3'))
+        # R2
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x00\x06\x4E\x42'))
+        # R1
+        internalOutput.writePLL(internalOutput.spi, bytearray(b'\x08\x00\xA7\x11'))
+        # R0
+        internalOutput.writePLL(internalOutput.spi, r0Pll.to_bytes(4, 'big'))
+    
+        # tune drive unit and allow tx
+        if vfo.getTxFrequency() >= 144000000 and vfo.getTxFrequency() < 146000000 \
+        and userInput.isPressed(userInput.pttButton) \
+        and not scanner.isOn() \
+        and not userInput.isPressed(userInput.msSwitch) \
+        and not userInput.isPressed(userInput.reverseButton):
+            # dac Vref = 3.3 V
+            dacVoltage = (currentFrequency / 2000000.0) - 70.9
+            dacValue = int(dacVoltage / 3.3 * 4096)
+            i2c.dac.write(dacValue)
         
+    if not memScanOn:
         internalOutput.setTxForbidden(False)
         
     # display line 1
