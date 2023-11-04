@@ -51,6 +51,9 @@ target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
 add_library(TrxState TrxState.cpp)
 target_link_libraries(TrxState pico_stdlib)
 
+add_library(settings settings.h)
+target_link_libraries(settings pico_stdlib)
+
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
