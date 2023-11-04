@@ -8,7 +8,7 @@
 
 #include "settings.h"
 #include "TrxState.h"
-
+#include "Display.h"
 
 
 
@@ -21,4 +21,5 @@ int main()
     gpio_pull_up(I2C_SDA);
     gpio_pull_up(I2C_SCL);
 
+    auto display = Display::getInstance();
 }

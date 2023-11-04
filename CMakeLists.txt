@@ -54,6 +54,9 @@ target_link_libraries(TrxState pico_stdlib)
 add_library(settings settings.h)
 target_link_libraries(settings pico_stdlib)
 
+add_library(Display Display.cpp)
+target_link_libraries(Display pico_stdlib pico_ssd1306)
+
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
@@ -61,6 +64,7 @@ target_link_libraries(tr-pll
         hardware_pio
         hardware_timer
         TrxState
+        Display
         )
 
 pico_add_extra_outputs(tr-pll)
