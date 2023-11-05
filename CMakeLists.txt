@@ -44,8 +44,7 @@ target_include_directories(tr-pll PRIVATE
 )
 
 
-# OLED
-add_subdirectory(pico-ssd1306)
+add_subdirectory(pico-ssd1306) # OLED
 target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
 
 add_library(TrxState TrxState.cpp)
@@ -55,7 +54,7 @@ add_library(settings settings.h)
 target_link_libraries(settings pico_stdlib)
 
 add_library(Display Display.cpp)
-target_link_libraries(Display pico_stdlib pico_ssd1306)
+target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c)
 
 
 # Add any user requested libraries
