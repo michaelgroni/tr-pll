@@ -1,6 +1,5 @@
 #include "TrxState.h"
 
-#include "pico/stdlib.h"
 
 #include "settings.h"
 

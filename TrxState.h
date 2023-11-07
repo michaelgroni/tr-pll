@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pico/stdlib.h"
+
 class TrxState
 {
 public:

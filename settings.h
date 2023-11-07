@@ -16,3 +16,7 @@ inline const auto I2C_PORT = i2c0;
 // I2C OLED display 128 x 32
 inline const int OLED_ADDRESS = 0x3C;
 inline const bool OLED_FLIPPED = false;
+
+// I2C input / output
+inline const uint8_t IC3_ADDR = 32;
+inline const uint8_t IC4_ADDR = 33;
