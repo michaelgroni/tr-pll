@@ -1,5 +1,11 @@
 #pragma once
 #include "pico/stdlib.h"
+#include "hardware/i2c.h"
+
+// frequencies
+inline const uint32_t F_MIN = 143000000;
+inline const uint32_t F_MAX = 150000000;
+
 
 // I2C bus
 inline const uint8_t I2C_SDA = 0;

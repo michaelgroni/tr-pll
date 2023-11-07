@@ -50,11 +50,20 @@ target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
 add_library(TrxState TrxState.cpp)
 target_link_libraries(TrxState pico_stdlib)
 
-add_library(settings settings.h)
-target_link_libraries(settings pico_stdlib)
+add_library(TrxStateVfo TrxStateVfo.cpp)
+target_link_libraries(TrxStateVfo TrxState pico_stdlib)
+
+add_library(settings settings.cpp)
+target_link_libraries(settings pico_stdlib hardware_i2c)
 
 add_library(Display Display.cpp)
 target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c)
+
+add_library(GPIOinput GPIOinput.cpp)
+target_link_libraries(GPIOinput settings pico_stdlib)
+
+add_library(I2Cinput I2Cinput.cpp)
+target_link_libraries(I2Cinput settings pico_stdlib)
 
 
 # Add any user requested libraries
@@ -63,7 +72,11 @@ target_link_libraries(tr-pll
         hardware_pio
         hardware_timer
         TrxState
+        TrxStateVfo
         Display
+        GPIOinput
+        I2Cinput
+        settings
         )
 
 pico_add_extra_outputs(tr-pll)

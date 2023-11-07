@@ -9,6 +9,7 @@
 #include "settings.h"
 #include "TrxState.h"
 #include "Display.h"
+#include "I2Cinput.h"
 
 
 
@@ -22,4 +23,11 @@ int main()
     gpio_pull_up(I2C_SCL);
 
     auto display = Display::getInstance();
+    auto i2cInput = I2Cinput::getInstance();
+
+    // main loop
+    while (true)
+    {
+        i2cInput->update();
+    }
 }
