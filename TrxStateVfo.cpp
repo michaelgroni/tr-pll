@@ -9,7 +9,7 @@ TrxStateVfo::TrxStateVfo(uint32_t rxFrequency)
 }
 
 
-uint32_t TrxStateVfo::getTxFrequency()
+uint32_t TrxStateVfo::getTxFrequency() const
 {
     auto offset = I2Cinput::getInstance()->getDuplexOffset();
     return getRxFrequency() + offset;

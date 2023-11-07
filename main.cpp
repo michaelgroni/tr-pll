@@ -7,10 +7,10 @@
 #include "pico-ssd1306/ssd1306.h"
 
 #include "settings.h"
-#include "TrxState.h"
+#include "TrxStateVfo.h"
 #include "Display.h"
 #include "I2Cinput.h"
-
+#include "GPIOinput.h"
 
 
 int main()
@@ -22,8 +22,6 @@ int main()
     gpio_pull_up(I2C_SDA);
     gpio_pull_up(I2C_SCL);
 
-    auto display = Display::getInstance();
-    auto i2cInput = I2Cinput::getInstance();
 
     // setup GPIO input
     for (auto [name, pin] : gpioInPins)
@@ -32,9 +30,21 @@ int main()
         gpio_pull_up(pin);
     }
 
+    auto i2cInput = I2Cinput::getInstance();
+
+    TrxStateVfo vfoA(VFO_A_INIT);
+    TrxStateVfo vfoB(VFO_B_INIT);
+    
+    
     // main loop
     while (true)
     {
-        i2cInput->update();
+        // read I²C input
+        i2cInput->update(); // must be called in the main loop
+
+        // read vfo switch
+        TrxState* currentState = isPressed("ab") ? &vfoB : &vfoA;
+
+        Display::getInstance()->update(*currentState);
     }
 }

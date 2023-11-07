@@ -6,12 +6,25 @@
 Display::Display()
 {
     oled.setOrientation(OLED_FLIPPED);
+    oled.setContrast(OLED_CONTRAST);
 }
 
 
 void Display::update(const TrxState& trxState)
 {
-    oled.sendBuffer();
+    bool changed = false;
+
+    auto newFrequency = trxState.getRxFrequency();
+    if (newFrequency != frequency)
+    {
+        setFrequency(newFrequency);
+        changed = true;
+    }
+
+    if (changed)
+    {
+        oled.sendBuffer();
+    }
 }
 
 
@@ -31,7 +44,7 @@ void Display::drawDigit(uint8_t x, uint8_t y, uint digit)
     switch (digit)
     {
         case 1:
-            drawLine(&oled, x+5, y, x+5, y+13);
+            drawLine(&oled, x+5, y, x+5, y+14);
             break;
         case 2:
             drawLine(&oled, x+1, y, x+7, y);
@@ -42,37 +55,37 @@ void Display::drawDigit(uint8_t x, uint8_t y, uint digit)
             break;
         case 3:
             drawLine(&oled, x+1, y, x+7, y);
-            drawLine(&oled, x+8, y, x+8, y+13);
+            drawLine(&oled, x+8, y, x+8, y+14);
             drawLine(&oled, x+1, y+7, x+7, y+7);
             drawLine(&oled, x+1, y+14, x+7, y+14);
             break;
         case 4:
             drawLine(&oled, x, y, x, y+6);
-            drawLine(&oled, x+8, y, x+13, y);
+            drawLine(&oled, x+8, y, x+8, y+14);
             drawLine(&oled, x+1, y+7, x+7, y+7);
             break;
         case 6:
-            drawLine(&oled, x, y+7, x, y+13);
+            drawLine(&oled, x, y+7, x, y+14);
         case 5:
             drawLine(&oled, x, y, x, y+6);
             drawLine(&oled, x+1, y, x+7, y);
-            drawLine(&oled, x+8, y+7, x+8, y+13);
+            drawLine(&oled, x+8, y+7, x+8, y+14);
             drawLine(&oled, x+1, y+7, x+7, y+7);
             drawLine(&oled, x+1, y+14, x+7, y+14);
             break;
         case 0:
-            drawLine(&oled, x, y, x, y+13);
+            drawLine(&oled, x, y, x, y+14);
             drawLine(&oled, x+1, y+14, x+7, y+14);
         case 7:
             drawLine(&oled, x+1, y, x+7, y);
-            drawLine(&oled, x+8, y, x+8, y+13);
+            drawLine(&oled, x+8, y, x+8, y+14);
             break;
         case 8:
             drawLine(&oled, x, y+7, x, y+14);
         case 9:
             drawLine(&oled, x, y, x, y+6);
             drawLine(&oled, x+1, y, x+7, y);
-            drawLine(&oled, x+8, y, x+8, y+13);
+            drawLine(&oled, x+8, y, x+8, y+14);
             drawLine(&oled, x+1, y+7, x+7, y+7);
             drawLine(&oled, x+1, y+14, x+7, y+14);
             break;
@@ -85,13 +98,13 @@ void Display::drawDigit(uint8_t x, uint8_t y, uint digit)
 
 void Display::setFrequency(uint32_t frequency)
 {
+    this->frequency = frequency;
+
     fillRect(&oled, 24, 0, 110, 15, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
 
-    drawDigit(0, 0, 1); // Anything else than 1 in the first position is unrealistic. So we can save two pixels here.
-    uint8_t x=12;
-    
-    uint column=1;
-    for (uint i = 100000000; i>=10; i/=10)
+    uint8_t x=0;    
+    uint column=0;
+    for (uint i = 1000000000; i>=10; i/=10)
     {
         uint digit = (frequency % i) / (i/10);
         drawDigit(x, 0, digit);

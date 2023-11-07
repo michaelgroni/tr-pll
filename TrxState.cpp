@@ -19,7 +19,7 @@ TrxState::TrxState(uint32_t rxFrequency)
     }
 }
 
-uint32_t TrxState::getRxFrequency()
+uint32_t TrxState::getRxFrequency() const
 {
     return rxFrequency;
 }

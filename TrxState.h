@@ -6,7 +6,8 @@ class TrxState
 {
 public:
     TrxState(uint32_t rxFrequency);
-    uint32_t getRxFrequency();
+    uint32_t getRxFrequency() const;
+    virtual uint32_t getTxFrequency() const = 0;
 
 private:
     uint32_t rxFrequency;

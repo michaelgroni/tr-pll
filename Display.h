@@ -12,6 +12,8 @@ public:
     void update(const TrxState& trxState);
 
 private:
+    uint32_t frequency = 0;
+
     Display();                              
     Display(const Display&);                   // disable copy constructor              
     Display & operator = (const Display &);    // disable operator =
