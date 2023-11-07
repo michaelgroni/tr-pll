@@ -1,7 +1,7 @@
 #include "TrxState.h"
 
-
 #include "settings.h"
+#include "GPIOinput.h"
 
 TrxState::TrxState(uint32_t rxFrequency)
 {
@@ -22,4 +22,16 @@ TrxState::TrxState(uint32_t rxFrequency)
 uint32_t TrxState::getRxFrequency() const
 {
     return rxFrequency;
+}
+
+uint32_t TrxState::getCurrentFrequency() const
+{
+    if (isPressed("ptt"))
+    {
+        return getTxFrequency();
+    }
+    else
+    {
+        return getRxFrequency();
+    }
 }

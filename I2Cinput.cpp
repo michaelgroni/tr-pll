@@ -1,9 +1,7 @@
 #include "I2Cinput.h"
 
 I2Cinput::I2Cinput()
-{
-
-}
+{}
 
 
 void I2Cinput::update() // must be called in the main loop
@@ -32,7 +30,7 @@ mode I2Cinput::getMode()
     if (byte1 & 8 == 0)
         return lsb;
     if (byte1 & 16 == 0)
-        return fm1;
+        return fm2;
     if (byte1 & 32 == 0)
         return ctcss;
     return usb;
@@ -42,7 +40,7 @@ int32_t I2Cinput::getDuplexOffset()
 {
     mode m = getMode();
 
-    if (m==fm1 || m==ctcss)
+    if (m==fm2 || m==ctcss)
     {    
         if (byte1 & 64 == 0)
             return -600000;

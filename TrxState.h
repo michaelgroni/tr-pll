@@ -8,6 +8,7 @@ public:
     TrxState(uint32_t rxFrequency);
     uint32_t getRxFrequency() const;
     virtual uint32_t getTxFrequency() const = 0;
+    uint32_t getCurrentFrequency() const;
 
 private:
     uint32_t rxFrequency;

@@ -14,7 +14,7 @@ void Display::update(const TrxState& trxState)
 {
     bool changed = false;
 
-    auto newFrequency = trxState.getRxFrequency();
+    auto newFrequency = trxState.getCurrentFrequency();
     if (newFrequency != frequency)
     {
         setFrequency(newFrequency);
