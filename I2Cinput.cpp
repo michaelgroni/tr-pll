@@ -41,18 +41,16 @@ mode I2Cinput::getMode()
 int32_t I2Cinput::getDuplexOffset()
 {
     mode m = getMode();
+
     if (m==fm1 || m==ctcss)
     {    
         if (byte1 & 64 == 0)
             return -600000;
         if (byte1 & 128 == 0)
             return 600000;
-        return 0;
     }
-    else // not FM
-    {
-        return 0;
-    }
+    
+    return 0;
 }
 
 I2Cinput* I2Cinput::getInstance()
