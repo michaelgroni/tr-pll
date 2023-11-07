@@ -6,21 +6,12 @@
 Display::Display()
 {
     oled.setOrientation(OLED_FLIPPED);
-    drawText(&oled, font_12x16, "145400000", 0, 0);
-    oled.sendBuffer();
-    /*
-    for (int y = 0; y < 32; y++)
-    {
-        oled.setPixel(64, y);
-        oled.sendBuffer(); //Send buffer to device and show on screen
-    }
-    */
 }
 
 
-void Display::update()
+void Display::update(const TrxState& trxState)
 {
-
+    oled.sendBuffer();
 }
 
 
@@ -35,9 +26,9 @@ Display* Display::getInstance()
     digits 0..9
     height 14, width 8
 */
-void Display::drawCharacter(uint8_t x, uint8_t y, char c)
+void Display::drawDigit(uint8_t x, uint8_t y, uint digit)
 {
-    switch (c)
+    switch (digit)
     {
         case 1:
             drawLine(&oled, x+5, y, x+5, y+13);
@@ -89,5 +80,32 @@ void Display::drawCharacter(uint8_t x, uint8_t y, char c)
             drawLine(&oled, x+1, y, x+6, y);
             drawLine(&oled, x+1, y+7, x+6, y+14);
             drawLine(&oled, x+1, y+14, x+6, y+14); 
+    }
+}
+
+void Display::setFrequency(uint32_t frequency)
+{
+    fillRect(&oled, 24, 0, 110, 15, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
+
+    drawDigit(0, 0, 1); // Anything else than 1 in the first position is unrealistic. So we can save two pixels here.
+    uint8_t x=12;
+    
+    uint column=1;
+    for (uint i = 100000000; i>=10; i/=10)
+    {
+        uint digit = (frequency % i) / (i/10);
+        drawDigit(x, 0, digit);
+
+        if (column==2 || column==5) // thousands point
+        {
+            oled.setPixel(x+11, 14);
+            x += 14;
+        }
+        else // no thousands point
+        {
+            x += 12;
+        }
+
+        column++;
     }
 }
