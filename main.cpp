@@ -25,6 +25,13 @@ int main()
     auto display = Display::getInstance();
     auto i2cInput = I2Cinput::getInstance();
 
+    // setup GPIO input
+    for (auto [name, pin] : gpioInPins)
+    {
+        gpio_init(pin);
+        gpio_pull_up(pin);
+    }
+
     // main loop
     while (true)
     {

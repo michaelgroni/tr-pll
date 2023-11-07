@@ -2,10 +2,12 @@
 
 #include "settings.h"
 
+#include <string>
 class GPIOinput
 {
 public:
     static GPIOinput* getInstance();
+    bool isPressed(std::string pinName);
 
 private:
     GPIOinput();                              
