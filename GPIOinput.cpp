@@ -3,5 +3,6 @@
 
 bool isPressed(std::string pinName)
 {
-    return !gpio_get(gpioInPins.at(pinName));
+    auto pin = gpioInPins.at(pinName);
+    return !gpio_get(pin);
 }

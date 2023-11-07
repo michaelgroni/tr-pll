@@ -2,9 +2,9 @@
 
 #include "settings.h"
 
-enum mode {usb, lsb, fm1, ctcss};
+enum mode {usb, lsb, fm2, ctcss};
 // For the control unit CW ist the same as USB.
-// The FM2 postion of the switch is used for CTCSS.
+// The FM1 postion of the switch is used for CTCSS.
 
 class I2Cinput
 {

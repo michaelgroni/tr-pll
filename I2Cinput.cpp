@@ -12,26 +12,26 @@ void I2Cinput::update() // must be called in the main loop
 
 uint8_t I2Cinput::getMemoryChannel() // memory switch
 {
-    if (byte2 & 4 == 0)
+    if ((byte2 & 4) == 0)
         return 6;
-    if (byte2 & 8 == 0)
+    if ((byte2 & 8) == 0)
         return 5;
-    if (byte1 & 1 == 0)
+    if ((byte1 & 1) == 0)
         return 4;
-    if (byte1 & 2 == 0)
+    if ((byte1 & 2) == 0)
         return 3;
-    if (byte1 & 4 == 0)
+    if ((byte1 & 4) == 0)
         return 2;
     return 1;
 }
 
 mode I2Cinput::getMode()
 {
-    if (byte1 & 8 == 0)
+    if ((byte1 & 8) == 0)
         return lsb;
-    if (byte1 & 16 == 0)
+    if ((byte1 & 16) == 0)
         return fm2;
-    if (byte1 & 32 == 0)
+    if ((byte1 & 32) == 0)
         return ctcss;
     return usb;
 }
@@ -40,11 +40,11 @@ int32_t I2Cinput::getDuplexOffset()
 {
     mode m = getMode();
 
-    if (m==fm2 || m==ctcss)
+    if ((m==fm2) || (m==ctcss))
     {    
-        if (byte1 & 64 == 0)
+        if ((byte1 & 64) == 0)
             return -600000;
-        if (byte1 & 128 == 0)
+        if ((byte1 & 128) == 0)
             return 600000;
     }
     
