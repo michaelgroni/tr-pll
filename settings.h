@@ -9,7 +9,7 @@
 inline const uint32_t F_MIN = 143000000;
 inline const uint32_t F_MAX = 150000000;
 inline const uint32_t F_MIN_TX = 144000000;
-inline const uint32_t F_MAX_TX = 145000000;
+inline const uint32_t F_MAX_TX = 146000000;
 inline const uint32_t VFO_A_INIT = 145400000;
 inline const uint32_t VFO_B_INIT = 144375000;
 

@@ -13,6 +13,20 @@
 #include "GPIOinput.h"
 #include "MCP4725.h"
 
+
+void setTxAllowed(bool allowed)
+{
+    if (allowed)
+    {
+        gpio_put(TX_FORBIDDEN_PIN, 0);
+    }
+    else
+    {
+        gpio_put(TX_FORBIDDEN_PIN, 1);
+    }
+}
+
+
 int main()
 {
     // setup I2C
@@ -28,6 +42,11 @@ int main()
         gpio_init(pin);
         gpio_pull_up(pin);
     }
+
+    // setup GPIO output
+    gpio_init(TX_FORBIDDEN_PIN);
+    gpio_set_dir(TX_FORBIDDEN_PIN, true);
+    setTxAllowed(false);
 
     auto i2cInput = I2Cinput::getInstance();
 
@@ -45,6 +64,7 @@ int main()
             // read vfo switch
             TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
 
+            setTxAllowed(currentState->isTxAllowed());
             Display::getInstance()->update(*currentState);
         }
     }
