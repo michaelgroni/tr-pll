@@ -11,7 +11,7 @@
 #include "Display.h"
 #include "I2Cinput.h"
 #include "GPIOinput.h"
-
+#include "MCP4725.h"
 
 int main()
 {
@@ -21,7 +21,6 @@ int main()
     gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
     gpio_pull_up(I2C_SDA);
     gpio_pull_up(I2C_SCL);
-
 
     // setup GPIO input
     for (auto [name, pin] : gpioInPins)
@@ -34,18 +33,20 @@ int main()
 
     TrxStateVfo vfoA(VFO_A_INIT);
     TrxStateVfo vfoB(VFO_B_INIT);
-    
-    
+
     // main loop
     while (true)
     {
-        // read I²C input
-        i2cInput->update(); // must be called in the main loop
+        if (!isPressed("ptt"))
+        {
+            // read I²C input
+            i2cInput->update(); // must be called in the main loop
 
-        // read vfo switch
-        TrxState* currentState = isPressed("ab") ? &vfoB : &vfoA;
+            // read vfo switch
+            TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
 
-        Display::getInstance()->update(*currentState);
+            Display::getInstance()->update(*currentState);
+        }
     }
 }
 

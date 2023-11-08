@@ -18,3 +18,9 @@ void writeDAC(const uint16_t value)
         oldValue = value;
     }
 }
+
+
+uint16_t dacValue(const double voltage)
+{
+    return (uint16_t) (voltage / 3.3 * 4096);
+}
