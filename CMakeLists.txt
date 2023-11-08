@@ -65,6 +65,9 @@ target_link_libraries(GPIOinput settings pico_stdlib)
 add_library(I2Cinput I2Cinput.cpp)
 target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c)
 
+add_library(MCP4725 MCP4725.cpp)
+target_link_libraries(MCP4725 settings pico_stdlib hardware_i2c)
+
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
@@ -77,6 +80,7 @@ target_link_libraries(tr-pll
         GPIOinput
         I2Cinput
         settings
+        MCP4725
         )
 
 pico_add_extra_outputs(tr-pll)

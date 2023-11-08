@@ -28,6 +28,10 @@ inline const unsigned char OLED_CONTRAST = 255;
 inline const uint8_t IC3_ADDR = 32;
 inline const uint8_t IC4_ADDR = 33;
 
+// I2C DAC (tunes drive unit)
+inline const uint8_t DAC_ADDR = 96;
+inline double dacVoltage(uint32_t frequency) {return (frequency / 2000000.0) - 70.9;}
+
 // GPIO input pins
 inline const std::unordered_map<std::string, uint> gpioInPins =
 {
