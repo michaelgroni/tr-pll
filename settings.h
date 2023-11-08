@@ -30,7 +30,7 @@ inline const uint8_t IC4_ADDR = 33;
 
 // I2C DAC (tunes drive unit)
 inline const uint8_t DAC_ADDR = 96;
-inline double dacVoltage(uint32_t frequency) {return (frequency / 2000000.0) - 70.9;}
+inline double dacVoltage(const uint32_t frequency) {return (frequency / 2000000.0) - 70.9;}
 
 // GPIO input pins
 inline const std::unordered_map<std::string, uint> gpioInPins =
@@ -48,3 +48,6 @@ inline const std::unordered_map<std::string, uint> gpioInPins =
     {"ab", 11}, // pressed = VFO B - not pressed = VFO A
     {"reverse", 18}
 };
+
+// GPIO output pin
+inline const uint TX_FORBIDDEN_PIN = 2;

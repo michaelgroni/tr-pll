@@ -35,3 +35,9 @@ uint32_t TrxState::getCurrentFrequency() const
         return getRxFrequency();
     }
 }
+
+bool TrxState::isTxAllowed()
+{
+    auto const txf = getTxFrequency();
+    return (txf >= F_MIN_TX) && (txf <= F_MAX_TX);
+}
