@@ -56,18 +56,27 @@ int main()
     // main loop
     while (true)
     {
+        // read I²C input
+        i2cInput->update(); // must be called in the main loop
+        
         if (!isPressed("ptt"))
         {
-            // read I²C input
-            i2cInput->update(); // must be called in the main loop
-
             // read vfo switch
             TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
 
+            // tune drive unit
+            setTxAllowed(false);
+            writeDAC(dacValue(dacVoltage(currentState->getTxFrequency())));
             setTxAllowed(currentState->isTxAllowed());
+            
+            // update display
             Display::getInstance()->update(*currentState);
+        }
+        else // PTT pressed
+        // A change of modulation type must be processed even if the PTT is pressed.
+        // The VFO wheel and the UP/DOWN buttons should work always in SSB and CW.
+        {
+            // TODO
         }
     }
 }
-
-// https://github.com/gavinlyonsrepo/MCP4725_PICO
