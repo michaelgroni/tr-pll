@@ -4,6 +4,7 @@
 
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
+#include "hardware/spi.h"
 
 // frequencies
 inline const uint32_t F_MIN = 143000000;
@@ -31,6 +32,12 @@ inline const uint8_t IC4_ADDR = 33;
 // I2C DAC (tunes drive unit)
 inline const uint8_t DAC_ADDR = 96;
 inline double dacVoltage(const uint32_t frequency) {return (frequency / 2000000.0) - 70.9;}
+
+// SPI PLL
+inline const auto SPI_PORT = spi0;
+inline const uint8_t PLL_SPI_SCK = 6; // SCLK
+inline const uint8_t PLL_SPI_TX = 7;  // MOSI
+inline const uint8_t PLL_OUT_LE = 5;
 
 // GPIO input pins
 inline const std::unordered_map<std::string, uint> gpioInPins =

@@ -47,31 +47,35 @@ target_include_directories(tr-pll PRIVATE
 add_subdirectory(pico-ssd1306) # OLED
 target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
 
+add_library(settings settings.cpp)
+target_link_libraries(settings pico_stdlib hardware_i2c hardware_spi)
+
 add_library(TrxState TrxState.cpp)
-target_link_libraries(TrxState pico_stdlib hardware_i2c)
+target_link_libraries(TrxState pico_stdlib hardware_i2c settings hardware_spi)
 
 add_library(TrxStateVfo TrxStateVfo.cpp)
-target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c)
-
-add_library(settings settings.cpp)
-target_link_libraries(settings pico_stdlib hardware_i2c)
+target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c hardware_spi)
 
 add_library(Display Display.cpp)
-target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c)
+target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi)
 
 add_library(GPIOinput GPIOinput.cpp)
-target_link_libraries(GPIOinput settings pico_stdlib)
+target_link_libraries(GPIOinput settings pico_stdlib hardware_spi)
 
 add_library(I2Cinput I2Cinput.cpp)
-target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c)
+target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi)
 
 add_library(MCP4725 MCP4725.cpp)
-target_link_libraries(MCP4725 settings pico_stdlib hardware_i2c)
+target_link_libraries(MCP4725 settings pico_stdlib hardware_i2c hardware_spi)
+
+add_library(ADF4351 ADF4351.cpp)
+target_link_libraries(ADF4351 settings pico_stdlib hardware_spi)
 
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
         hardware_i2c
+        hardware_spi
         hardware_pio
         hardware_timer
         TrxState
@@ -81,6 +85,7 @@ target_link_libraries(tr-pll
         I2Cinput
         settings
         MCP4725
+        ADF4351
         )
 
 pico_add_extra_outputs(tr-pll)

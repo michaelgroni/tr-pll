@@ -12,6 +12,7 @@
 #include "I2Cinput.h"
 #include "GPIOinput.h"
 #include "MCP4725.h"
+#include "ADF4351.h"
 
 
 void setTxAllowed(bool allowed)
@@ -46,14 +47,18 @@ int main()
     // setup GPIO output
     gpio_init(TX_FORBIDDEN_PIN);
     gpio_set_dir(TX_FORBIDDEN_PIN, true);
-    setTxAllowed(false);
+  
 
     auto i2cInput = I2Cinput::getInstance();
 
     TrxStateVfo vfoA(VFO_A_INIT);
     TrxStateVfo vfoB(VFO_B_INIT);
 
+
     // main loop
+    setTxAllowed(false);
+    TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
+
     while (true)
     {
         // read I²C input
@@ -61,22 +66,26 @@ int main()
         
         if (!isPressed("ptt"))
         {
-            // read vfo switch
-            TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
-
-            // tune drive unit
             setTxAllowed(false);
-            writeDAC(dacValue(dacVoltage(currentState->getTxFrequency())));
-            setTxAllowed(currentState->isTxAllowed());
-            
-            // update display
-            Display::getInstance()->update(*currentState);
+
+            // read vfo switch
+            currentState = isPressed("ab") ? &vfoB : &vfoA;   
         }
         else // PTT pressed
-        // A change of modulation type must be processed even if the PTT is pressed.
         // The VFO wheel and the UP/DOWN buttons should work always in SSB and CW.
         {
             // TODO
         }
+
+        
+
+        // update display
+        Display::getInstance()->update(*currentState);
+
+        // configure pll and tune drive unit
+        ADF4351::getInstance()->write(currentState->getCurrentFrequency());
+        writeDAC(dacValue(dacVoltage(currentState->getTxFrequency())));
+
+        setTxAllowed(currentState->isTxAllowed());
     }
 }
