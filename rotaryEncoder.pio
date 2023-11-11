@@ -1,20 +1,18 @@
 .program rotary
+    wait 1 pin 0
 .wrap_target
 loop:
-    set x, 0
-    jmp x-- loop ; x = -1
-
     wait 0 pin 0
     wait 1 pin 0
-    jmp pin up
+    jmp pin down
 
-;down:
-    in x, 1 ; in 1
+;up:
+    in pins, 1 ; in 1 because input pin is high
     push block
     jmp loop
 
-up:
-    in x, 32 ; in -1
+down:
+    mov isr, ~null ; in -1
     push block
 .wrap ; jmp loop
     

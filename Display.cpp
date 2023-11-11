@@ -50,7 +50,7 @@ void Display::drawDigit(uint8_t x, uint8_t y, uint digit)
             drawLine(&oled, x+1, y, x+7, y);
             drawLine(&oled, x+8, y, x+8, y+6);
             drawLine(&oled, x+1, y+7, x+7, y+7);
-            drawLine(&oled, x, y+8, x+6, y+8);
+            drawLine(&oled, x, y+8, x, y+13);
             drawLine(&oled, x+1, y+14, x+7, y+14);
             break;
         case 3:
