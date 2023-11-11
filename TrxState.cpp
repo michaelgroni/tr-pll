@@ -36,6 +36,11 @@ uint32_t TrxState::getCurrentFrequency() const
     }
 }
 
+void TrxState::setRxFrequency(uint32_t frequency) // TODO remove quick and dirty method
+{
+    rxFrequency = frequency;
+}
+
 bool TrxState::isTxAllowed()
 {
     auto const txf = getTxFrequency();

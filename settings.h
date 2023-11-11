@@ -5,6 +5,7 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/spi.h"
+#include "hardware/pio.h"
 
 // frequencies
 inline const uint32_t F_MIN = 143000000;
@@ -39,11 +40,14 @@ inline const uint8_t PLL_SPI_SCK = 6; // SCLK
 inline const uint8_t PLL_SPI_TX = 7;  // MOSI
 inline const uint8_t PLL_OUT_LE = 5;
 
+// PIOs
+inline const auto ROTARY_PIO = pio0;
+
 // GPIO input pins
 inline const std::unordered_map<std::string, uint> gpioInPins =
 {
     {"rotaryClock", 14},
-    {"rotaryData", 15},
+    {"rotaryData", 15}, // must be rotaryClock's number + 1
     {"rotaryButton", 22},
     {"micUp", 12},
     {"micDown", 13},

@@ -9,6 +9,7 @@ public:
     uint32_t getRxFrequency() const;
     virtual uint32_t getTxFrequency() const = 0;
     uint32_t getCurrentFrequency() const;
+    void setRxFrequency(uint32_t frequency);
     bool isTxAllowed();
 
 private:
