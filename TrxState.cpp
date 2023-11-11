@@ -36,13 +36,24 @@ uint32_t TrxState::getCurrentFrequency() const
     }
 }
 
-void TrxState::setRxFrequency(uint32_t frequency) // TODO remove quick and dirty method
-{
-    rxFrequency = frequency;
-}
 
 bool TrxState::isTxAllowed()
 {
     auto const txf = getTxFrequency();
     return (txf >= F_MIN_TX) && (txf <= F_MAX_TX);
+}
+
+void TrxState::up(int n)
+{
+    rxFrequency -= (rxFrequency % step); // step could have been changed
+    rxFrequency += (n * step);
+
+    if (rxFrequency > F_MAX)
+    {
+        rxFrequency = F_MIN + rxFrequency - F_MAX - step;
+    }
+    else if (rxFrequency < F_MIN)
+    {
+        rxFrequency = F_MAX - (rxFrequency - F_MIN) + step;
+    }
 }

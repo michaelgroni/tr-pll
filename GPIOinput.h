@@ -5,3 +5,5 @@
 #include <string>
 
 bool isPressed(std::string pinName);
+
+bool wasPressed(std::string pinName);

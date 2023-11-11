@@ -63,7 +63,6 @@ int main()
     pio_gpio_init(ROTARY_PIO, gpioInPins.at("rotaryClock"));
     pio_gpio_init(ROTARY_PIO, gpioInPins.at("rotaryData"));
     pio_sm_init(ROTARY_PIO, rotarySm, rotaryOffset, &rotaryConfig);
-    pio_sm_set_consecutive_pindirs(ROTARY_PIO, rotarySm, gpioInPins.at("rotaryClock"), 2, false);
     pio_sm_set_enabled(ROTARY_PIO, rotarySm, true); 
 
     auto i2cInput = I2Cinput::getInstance();
@@ -74,15 +73,6 @@ int main()
 
     setTxAllowed(false);
     TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
-      
-
-    // rotary encoder pio
-    /*
-    while (!pio_sm_is_rx_fifo_empty(ROTARY_PIO, rotarySm)) // clear RX FIFO
-    {
-        pio_sm_get(ROTARY_PIO, rotarySm);
-    }
-    */
 
 
     // main loop
@@ -97,6 +87,16 @@ int main()
         {
             updown += (int32_t) pio_sm_get(ROTARY_PIO, rotarySm);
         }
+
+        // read up and down buttons
+        if (wasPressed("micUp"))
+        {
+            updown++;
+        }
+        if (wasPressed("micDown"))
+        {
+            updown--;
+        }
         
         if (!isPressed("ptt"))
         {
@@ -104,7 +104,7 @@ int main()
 
             // read vfo switch
             currentState = isPressed("ab") ? &vfoB : &vfoA;  
-            currentState->setRxFrequency(currentState->getRxFrequency() + updown*10); // TODO remove quick and dirty method 
+            currentState->up(updown);
         }
         else // PTT pressed
         // The VFO wheel and the UP/DOWN buttons should work always in SSB and CW.

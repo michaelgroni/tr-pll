@@ -47,7 +47,7 @@ inline const auto ROTARY_PIO = pio0;
 inline const std::unordered_map<std::string, uint> gpioInPins =
 {
     {"rotaryClock", 14},
-    {"rotaryData", 15}, // must be rotaryClock's number + 1
+    {"rotaryData", 15},
     {"rotaryButton", 22},
     {"micUp", 12},
     {"micDown", 13},

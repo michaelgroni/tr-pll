@@ -7,8 +7,8 @@ loop:
     jmp pin down
 
 ;up:
-    in pins, 1 ; in 1 because input pin is high
-    push block
+    in pins, 1 ; in 1 
+    push block 
     jmp loop
 
 down:
