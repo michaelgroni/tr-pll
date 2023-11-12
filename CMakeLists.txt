@@ -44,6 +44,7 @@ target_include_directories(tr-pll PRIVATE
 )
 
 pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/rotaryEncoder.pio)
+pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/beep.pio)
 
 add_subdirectory(pico-ssd1306) # OLED
 target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
@@ -61,7 +62,7 @@ add_library(GPIOinput GPIOinput.cpp)
 target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio)
 
 add_library(GPIOoutput GPIOoutput.cpp)
-target_link_libraries(GPIOoutput settings)
+target_link_libraries(GPIOoutput settings pico_stdlib hardware_timer hardware_pio)
 
 add_library(I2Cinput I2Cinput.cpp)
 target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio) 
@@ -81,7 +82,6 @@ target_link_libraries(tr-pll
         hardware_i2c
         hardware_spi
         hardware_pio
-        hardware_timer
         TrxState
         TrxStateVfo
         Display

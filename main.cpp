@@ -2,7 +2,6 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/pio.h"
-#include "hardware/timer.h"
 
 #include "pico-ssd1306/ssd1306.h"
 
@@ -15,6 +14,7 @@
 #include "MCP4725.h"
 #include "ADF4351.h"
 #include "rotaryEncoder.pio.h"
+#include "beep.pio.h"
 
 
 int main()
@@ -50,10 +50,19 @@ int main()
     sm_config_set_jmp_pin(&rotaryConfig, ROTARY_DATA);
     sm_config_set_fifo_join(&rotaryConfig, PIO_FIFO_JOIN_RX);
     sm_config_set_in_shift(&rotaryConfig, false, false, 0);
-    pio_gpio_init(ROTARY_PIO, ROTARY_CLOCK);
-    pio_gpio_init(ROTARY_PIO, ROTARY_DATA);
     pio_sm_init(ROTARY_PIO, rotarySm, rotaryOffset, &rotaryConfig);
     pio_sm_set_enabled(ROTARY_PIO, rotarySm, true); 
+
+
+    // setup beep pio
+    uint beepOffset = pio_add_program(BEEP_PIO, &beep_program);
+    uint beepSm = pio_claim_unused_sm(BEEP_PIO, true);
+    pio_sm_config beepConfig = beep_program_get_default_config(beepOffset);
+    sm_config_set_set_pins(&beepConfig, BEEP_PIN, 1);
+    pio_gpio_init(BEEP_PIO, BEEP_PIN);
+    pio_sm_init(BEEP_PIO, beepSm, beepOffset, &beepConfig);
+    pio_sm_set_enabled(BEEP_PIO, beepSm, false); 
+
 
     auto i2cInput = I2Cinput::getInstance();
 
@@ -82,20 +91,24 @@ int main()
         if (wasPressed("stepIncrease") && isPressed("stepIncrease")) // read event and state to avoid crosstalk effects
         {
             currentState->stepUp();
+            beepOK(&beepConfig, beepSm);
         }
         if (wasPressed("stepDecrease") && isPressed("stepDecrease"))
         {
             currentState->stepDown();
+            beepOK(&beepConfig, beepSm);
         }        
 
         // read up and down buttons
         if (wasPressed("micUp") && isPressed("micUp")) // read event and state to avoid crosstalk effects
         {
             updown++;
+            beepOK(&beepConfig, beepSm);
         }
         if (wasPressed("micDown") && isPressed("micDown"))
         {
             updown--;
+            beepOK(&beepConfig, beepSm);
         }
         
         if (!isPressed("ptt"))

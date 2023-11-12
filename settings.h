@@ -42,6 +42,7 @@ inline const uint8_t PLL_OUT_LE = 5;
 
 // PIOs
 inline const auto ROTARY_PIO = pio0;
+inline const auto BEEP_PIO = pio1;
 
 // GPIO input pins
 inline const std::unordered_map<std::string, uint> gpioInPins =
@@ -64,3 +65,6 @@ inline const uint8_t ROTARY_DATA = 15;
 
 // GPIO output pin
 inline const uint TX_FORBIDDEN_PIN = 2;
+
+// beep pio output pin
+inline const uint BEEP_PIN = 3;
