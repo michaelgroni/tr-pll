@@ -83,6 +83,18 @@ void TrxState::stepDown()
     }
 }
 
+std::string TrxState::getStepToString() const
+{
+    if (stepIndex == 0)
+    {
+        return "auto";
+    }
+    else
+    {
+        return std::to_string(getStep());
+    }
+}
+
 unsigned int TrxState::getStep() const
 {
     if (stepIndex==0) // auto

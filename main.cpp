@@ -90,6 +90,16 @@ int main()
             updown += (int32_t) pio_sm_get(ROTARY_PIO, rotarySm);
         }
 
+        // read step buttons
+        if (wasPressed("stepIncrease") && isPressed("stepIncrease")) // read event and state to avoid crosstalk effects
+        {
+            currentState->stepUp();
+        }
+        if (wasPressed("stepDecrease") && isPressed("stepDecrease"))
+        {
+            currentState->stepDown();
+        }        
+
         // read up and down buttons
         if (wasPressed("micUp") && isPressed("micUp")) // read event and state to avoid crosstalk effects
         {

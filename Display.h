@@ -4,6 +4,7 @@
 
 #include "settings.h"
 #include "TrxState.h"
+#include <string>
 
 class Display
 {
@@ -13,7 +14,7 @@ public:
 
 private:
     uint32_t frequency = 0;
-    unsigned int step = 0;
+    std::string step = "";
 
     Display();                              
     Display(const Display&);                   // disable copy constructor              
@@ -23,5 +24,5 @@ private:
 
     void drawDigit(uint8_t x, uint8_t y, uint digit);
     void setFrequency(uint32_t frequency);
-    void setStep(unsigned int step);
+    void setStep(const std::string step);
 };

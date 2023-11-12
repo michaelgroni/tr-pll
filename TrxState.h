@@ -3,6 +3,7 @@
 #include "pico/stdlib.h"
 
 #include <array>
+#include <string>
 
 class TrxState
 {
@@ -19,8 +20,8 @@ public:
 
     void stepUp();
     void stepDown();
-    unsigned int getStep() const;
-
+    
+    std::string getStepToString() const;
 
 private:
     uint32_t rxFrequency;
@@ -28,4 +29,6 @@ private:
     // available steps
     std::array<unsigned int, 8> steps = {0, 10, 100, 1000, 10000, 12500, 100000, 1000000}; // 0 means auto
     size_t stepIndex = 0; // auto
+
+    unsigned int getStep() const;
 };

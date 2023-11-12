@@ -3,7 +3,6 @@
 #include "pico-ssd1306/textRenderer/TextRenderer.h"
 #include "pico-ssd1306/shapeRenderer/ShapeRenderer.h"
 
-#include <string>
 
 Display::Display()
 {
@@ -25,8 +24,8 @@ void Display::update(const TrxState& trxState)
     }
 
     // step
-    auto newStep = trxState.getStep();
-    if (newStep != step)
+    auto newStep = trxState.getStepToString();
+    if (step.compare(newStep) != 0)
     {
         setStep(newStep);
         changed = true;
@@ -111,7 +110,7 @@ void Display::setFrequency(uint32_t frequency)
 {
     this->frequency = frequency;
 
-    fillRect(&oled, 24, 0, 110, 15, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
+    fillRect(&oled, 0, 0, 110, 15, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
 
     uint8_t x=0;    
     uint column=0;
@@ -134,8 +133,11 @@ void Display::setFrequency(uint32_t frequency)
     }
 }
 
-void Display::setStep(unsigned int step)
+void Display::setStep(const std::string step)
 {
     this->step = step;
-    drawText(&oled, font_5x8, std::to_string(step).c_str(), 0, 16);
+
+    fillRect(&oled, 0, 17, 128, 24, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
+    std::string s = "Step " + step;
+    drawText(&oled, font_8x8, s.c_str(), 0, 17);
 }
