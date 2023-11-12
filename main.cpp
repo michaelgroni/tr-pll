@@ -91,7 +91,7 @@ int main()
         }
 
         // read up and down buttons
-        if (wasPressed("micUp") && isPressed("micUp"))
+        if (wasPressed("micUp") && isPressed("micUp")) // read event and state to avoid crosstalk effects
         {
             updown++;
         }
