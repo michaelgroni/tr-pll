@@ -3,6 +3,8 @@
 #include "pico-ssd1306/textRenderer/TextRenderer.h"
 #include "pico-ssd1306/shapeRenderer/ShapeRenderer.h"
 
+#include <string>
+
 Display::Display()
 {
     oled.setOrientation(OLED_FLIPPED);
@@ -14,10 +16,19 @@ void Display::update(const TrxState& trxState)
 {
     bool changed = false;
 
+    // frequency
     auto newFrequency = trxState.getCurrentFrequency();
     if (newFrequency != frequency)
     {
         setFrequency(newFrequency);
+        changed = true;
+    }
+
+    // step
+    auto newStep = trxState.getStep();
+    if (newStep != step)
+    {
+        setStep(newStep);
         changed = true;
     }
 
@@ -121,4 +132,10 @@ void Display::setFrequency(uint32_t frequency)
 
         column++;
     }
+}
+
+void Display::setStep(unsigned int step)
+{
+    this->step = step;
+    drawText(&oled, font_5x8, std::to_string(step).c_str(), 0, 16);
 }

@@ -83,7 +83,7 @@ void TrxState::stepDown()
     }
 }
 
-unsigned int TrxState::getStep()
+unsigned int TrxState::getStep() const
 {
     if (stepIndex==0) // auto
     {

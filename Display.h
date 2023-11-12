@@ -13,6 +13,7 @@ public:
 
 private:
     uint32_t frequency = 0;
+    unsigned int step = 0;
 
     Display();                              
     Display(const Display&);                   // disable copy constructor              
@@ -22,4 +23,5 @@ private:
 
     void drawDigit(uint8_t x, uint8_t y, uint digit);
     void setFrequency(uint32_t frequency);
+    void setStep(unsigned int step);
 };

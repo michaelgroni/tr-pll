@@ -19,7 +19,7 @@ public:
 
     void stepUp();
     void stepDown();
-    unsigned int getStep();
+    unsigned int getStep() const;
 
 
 private:
