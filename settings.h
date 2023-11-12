@@ -46,8 +46,6 @@ inline const auto ROTARY_PIO = pio0;
 // GPIO input pins
 inline const std::unordered_map<std::string, uint> gpioInPins =
 {
-    {"rotaryClock", 14},
-    {"rotaryData", 15},
     {"rotaryButton", 22},
     {"micUp", 12},
     {"micDown", 13},
@@ -59,6 +57,10 @@ inline const std::unordered_map<std::string, uint> gpioInPins =
     {"ab", 11}, // pressed = VFO B - not pressed = VFO A
     {"reverse", 18}
 };
+
+// rotary encoder pio input pins
+inline const uint8_t ROTARY_CLOCK = 14;
+inline const uint8_t ROTARY_DATA = 15;
 
 // GPIO output pin
 inline const uint TX_FORBIDDEN_PIN = 2;

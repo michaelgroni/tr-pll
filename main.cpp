@@ -51,17 +51,19 @@ int main()
 
 
     // setup rotary encoder pio
+    gpio_pull_up(ROTARY_CLOCK);
+    gpio_pull_up(ROTARY_DATA);
     uint rotaryOffset = pio_add_program(ROTARY_PIO, &rotary_program);
     uint rotarySm = pio_claim_unused_sm(ROTARY_PIO, true);
     pio_sm_config rotaryConfig = rotary_program_get_default_config(rotaryOffset);
-    sm_config_set_in_pins(&rotaryConfig, gpioInPins.at("rotaryClock"));
-    sm_config_set_jmp_pin(&rotaryConfig, gpioInPins.at("rotaryData"));
+    pio_gpio_init(ROTARY_PIO, ROTARY_CLOCK);
+    pio_gpio_init(ROTARY_PIO, ROTARY_DATA);
+    sm_config_set_in_pins(&rotaryConfig, ROTARY_CLOCK);
+    sm_config_set_jmp_pin(&rotaryConfig, ROTARY_DATA);
     sm_config_set_fifo_join(&rotaryConfig, PIO_FIFO_JOIN_RX);
     sm_config_set_in_shift(&rotaryConfig, false, false, 0);
-    gpio_pull_up(gpioInPins.at("rotaryClock"));
-    gpio_pull_up(gpioInPins.at("rotaryData"));
-    pio_gpio_init(ROTARY_PIO, gpioInPins.at("rotaryClock"));
-    pio_gpio_init(ROTARY_PIO, gpioInPins.at("rotaryData"));
+    pio_gpio_init(ROTARY_PIO, ROTARY_CLOCK);
+    pio_gpio_init(ROTARY_PIO, ROTARY_DATA);
     pio_sm_init(ROTARY_PIO, rotarySm, rotaryOffset, &rotaryConfig);
     pio_sm_set_enabled(ROTARY_PIO, rotarySm, true); 
 
@@ -89,11 +91,11 @@ int main()
         }
 
         // read up and down buttons
-        if (wasPressed("micUp"))
+        if (wasPressed("micUp") && isPressed("micUp"))
         {
             updown++;
         }
-        if (wasPressed("micDown"))
+        if (wasPressed("micDown") && isPressed("micDown"))
         {
             updown--;
         }
