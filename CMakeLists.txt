@@ -60,6 +60,9 @@ target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi
 add_library(GPIOinput GPIOinput.cpp)
 target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio)
 
+add_library(GPIOoutput GPIOoutput.cpp)
+target_link_libraries(GPIOoutput settings)
+
 add_library(I2Cinput I2Cinput.cpp)
 target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio) 
 
@@ -83,6 +86,7 @@ target_link_libraries(tr-pll
         TrxStateVfo
         Display
         GPIOinput
+        GPIOoutput
         I2Cinput
         settings
         MCP4725

@@ -11,22 +11,10 @@
 #include "Display.h"
 #include "I2Cinput.h"
 #include "GPIOinput.h"
+#include "GPIOoutput.h"
 #include "MCP4725.h"
 #include "ADF4351.h"
 #include "rotaryEncoder.pio.h"
-
-
-void setTxAllowed(bool allowed)
-{
-    if (allowed)
-    {
-        gpio_put(TX_FORBIDDEN_PIN, 0);
-    }
-    else
-    {
-        gpio_put(TX_FORBIDDEN_PIN, 1);
-    }
-}
 
 
 int main()
