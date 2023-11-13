@@ -20,7 +20,7 @@ void setTxAllowed(bool allowed)
 
 void beepOK(pio_sm_config *c, uint sm)
 {
-    sm_config_set_clkdiv(c, 12500);
+    pio_sm_set_clkdiv(BEEP_PIO, sm, 128);
     pio_sm_set_enabled(BEEP_PIO, sm, true);
     sleep_ms(75);
     pio_sm_set_enabled(BEEP_PIO, sm, false);
@@ -29,7 +29,7 @@ void beepOK(pio_sm_config *c, uint sm)
 
 void beepWriteOK(pio_sm_config *c, uint sm)
 {
-    sm_config_set_clkdiv(c, 15625);
+    pio_sm_set_clkdiv(BEEP_PIO, sm, 128);
     pio_sm_set_enabled(BEEP_PIO, sm, true);
     sleep_ms(250);
     pio_sm_set_enabled(BEEP_PIO, sm, false);
@@ -38,7 +38,7 @@ void beepWriteOK(pio_sm_config *c, uint sm)
     
 void beepError(pio_sm_config *c, uint sm)
 {
-    sm_config_set_clkdiv(c, 62500);
+    pio_sm_set_clkdiv(BEEP_PIO, sm, 255);
     for (int i=0; i<4; i++)
     {
         pio_sm_set_enabled(BEEP_PIO, sm, true);
@@ -46,6 +46,5 @@ void beepError(pio_sm_config *c, uint sm)
         pio_sm_set_enabled(BEEP_PIO, sm, false);
         sleep_ms(50);
     }
-    
 }
     

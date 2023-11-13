@@ -73,6 +73,7 @@ int main()
     setTxAllowed(false);
     TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
 
+    beepOK(&beepConfig, beepSm);
 
     // main loop
     while (true)
@@ -92,6 +93,7 @@ int main()
         {
             currentState->stepUp();
             beepOK(&beepConfig, beepSm);
+
         }
         if (wasPressed("stepDecrease") && isPressed("stepDecrease"))
         {
