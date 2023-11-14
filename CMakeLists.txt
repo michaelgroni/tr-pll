@@ -28,7 +28,7 @@ pico_sdk_init()
 add_executable(tr-pll main.cpp )
 
 pico_set_program_name(tr-pll "tr-pll")
-pico_set_program_version(tr-pll "0.1")
+pico_set_program_version(tr-pll "3.0")
 
 #pico_enable_stdio_uart(tr-pll 0)
 #pico_enable_stdio_usb(tr-pll 0)
@@ -45,6 +45,7 @@ target_include_directories(tr-pll PRIVATE
 
 pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/rotaryEncoder.pio)
 pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/beep.pio)
+pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/ctcss.pio)
 
 add_subdirectory(pico-ssd1306) # OLED
 target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
@@ -82,6 +83,7 @@ target_link_libraries(tr-pll
         hardware_i2c
         hardware_spi
         hardware_pio
+        hardware_clocks
         TrxState
         TrxStateVfo
         Display
