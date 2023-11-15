@@ -87,12 +87,14 @@ int main()
 
     beepOK(&beepConfig, beepSm);
 
+    /*
     const double fCtcss = 151.4;
     const uint cycles = 180;
     const auto sysClock = clock_get_hz(clk_sys);
     const double clkDiv = sysClock / (fCtcss * cycles);
     pio_sm_set_clkdiv(CTCSS_PIO, ctcssSm, clkDiv);
     pio_sm_set_enabled(CTCSS_PIO, ctcssSm, true);
+    */
 
     // main loop
     while (true)
@@ -100,7 +102,7 @@ int main()
         // read I²C input
         i2cInput->update(); // must be called in the main loop
 
-        // read from rotary encoder
+        // read rotary encoder
         int updown = 0;
         while (!pio_sm_is_rx_fifo_empty(ROTARY_PIO, rotarySm))
         {

@@ -15,6 +15,7 @@ void Display::update(const TrxState& trxState)
 {
     bool changed = false;
 
+    
     // frequency
     auto newFrequency = trxState.getCurrentFrequency();
     if (newFrequency != frequency)
@@ -23,6 +24,32 @@ void Display::update(const TrxState& trxState)
         changed = true;
     }
 
+
+    // duplex shift
+    const auto txf = trxState.getTxFrequency();
+    const auto rxf = trxState.getRxFrequency();
+    char infoNortheast;
+
+    if (txf < rxf)
+    {
+        infoNortheast = '-';
+    }
+    else if (txf > rxf)
+    {
+        infoNortheast = '+';
+    }
+    else
+    {
+        infoNortheast = ' ';
+    }
+
+    if (infoNortheast != this->infoNortheast)
+    {
+        setInfoNortheast(infoNortheast);
+        changed = true;
+    }
+
+
     // step
     auto newStep = trxState.getStepToString();
     if (step.compare(newStep) != 0)
@@ -30,6 +57,7 @@ void Display::update(const TrxState& trxState)
         setStep(newStep);
         changed = true;
     }
+
 
     if (changed)
     {
@@ -140,4 +168,16 @@ void Display::setStep(const std::string step)
     fillRect(&oled, 0, 17, 128, 24, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
     std::string s = "Step " + step;
     drawText(&oled, font_8x8, s.c_str(), 0, 17);
+}
+
+void Display::setInfoNortheast(const char c)
+{
+    this->infoNortheast = c;
+
+    char cString[2];
+    cString[0] = c;
+    cString[1] = '\0';
+
+    fillRect(&oled, 117, 0, 127, 15, pico_ssd1306::WriteMode::SUBTRACT);  // overwrite old content
+    drawText(&oled, font_12x16, cString, 117, 0);
 }

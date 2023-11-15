@@ -101,7 +101,7 @@ unsigned int TrxState::getStep() const
     {
         auto mode = I2Cinput::getInstance()->getMode();
 
-        if (mode==fm2 || mode==ctcss)
+        if ((mode==fm2) || (mode==ctcss))
         {
             return 12500;
         }

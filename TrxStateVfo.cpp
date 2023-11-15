@@ -15,3 +15,8 @@ uint32_t TrxStateVfo::getTxFrequency() const
     return getRxFrequency() + offset;
 }
 
+
+bool TrxStateVfo::isCtcssOn() const
+{
+    return I2Cinput::getInstance()->getMode() == ctcss;
+}
