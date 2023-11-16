@@ -3,6 +3,7 @@
 #include "hardware/i2c.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
+#include "hardware/timer.h"
 
 #include "pico-ssd1306/ssd1306.h"
 
@@ -99,6 +100,8 @@ int main()
     // main loop
     while (true)
     {
+        sleep_ms(1);
+
         // read I²C input
         i2cInput->update(); // must be called in the main loop
 

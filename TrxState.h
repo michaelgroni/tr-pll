@@ -38,6 +38,6 @@ private:
         186.2, 192.8, 203.5, 210.7, 218.1, 225.7, 233.6, 241.8, 250.3};
     size_t ctcssIndex = 7;
 
-
+    void frequencyUp(int n); // negative n for down
     unsigned int getStep() const;
 };

@@ -50,11 +50,11 @@ void Display::update(const TrxState& trxState)
     }
 
 
-    // step
+    // line2
     auto newStep = trxState.getStepToString();
-    if (step.compare(newStep) != 0)
+    if (line2.compare(newStep) != 0)
     {
-        setStep(newStep);
+        setLine2(newStep);
         changed = true;
     }
 
@@ -161,12 +161,12 @@ void Display::setFrequency(uint32_t frequency)
     }
 }
 
-void Display::setStep(const std::string step)
+void Display::setLine2(const std::string line2)
 {
-    this->step = step;
+    this->line2 = line2;
 
     fillRect(&oled, 0, 17, 128, 24, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
-    std::string s = "Step " + step;
+    std::string s = "Step " + line2;
     drawText(&oled, font_8x8, s.c_str(), 0, 17);
 }
 

@@ -1,5 +1,7 @@
 #include "I2Cinput.h"
 
+#include "hardware/timer.h"
+
 I2Cinput::I2Cinput()
 {}
 
@@ -27,12 +29,28 @@ uint8_t I2Cinput::getMemoryChannel() // memory switch
 
 mode I2Cinput::getMode()
 {
+    mode m = getModePrivate();
+
+    if (m == usb) // mode is USB/CW or the switch is being moved at the moment
+    {
+        sleep_ms(DEBOUNCE_TIME);
+        update();
+        return getModePrivate();
+    }
+    else
+    {
+        return m;
+    }
+}
+
+mode I2Cinput::getModePrivate()
+{
     if ((byte1 & 8) == 0)
         return lsb;
     if ((byte1 & 16) == 0)
-        return fm2;
-    if ((byte1 & 32) == 0)
         return ctcss;
+    if ((byte1 & 32) == 0)
+        return fm2;
     return usb;
 }
 

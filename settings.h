@@ -15,6 +15,9 @@ inline const uint32_t F_MAX_TX = 146000000;
 inline const uint32_t VFO_A_INIT = 145400000;
 inline const uint32_t VFO_B_INIT = 144375000;
 
+// debouncing
+inline const uint32_t DEBOUNCE_TIME = 200; // milliseconds
+
 // I2C bus
 inline const uint8_t I2C_SDA = 0;
 inline const uint8_t I2C_SCL = 1;

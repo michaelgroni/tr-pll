@@ -14,7 +14,7 @@ public:
 
 private:
     uint32_t frequency = 0;
-    std::string step = "";
+    std::string line2 = "";
     char infoNortheast = ' ';
 
     Display();                              
@@ -25,6 +25,6 @@ private:
 
     void drawDigit(uint8_t x, uint8_t y, uint digit);
     void setFrequency(uint32_t frequency);
-    void setStep(const std::string step);
+    void setLine2(const std::string line2);
     void setInfoNortheast(const char c);
 };

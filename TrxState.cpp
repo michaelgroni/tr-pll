@@ -46,16 +46,11 @@ bool TrxState::isTxAllowed()
 
 void TrxState::up(int n)
 {
-    rxFrequency -= (rxFrequency % getStep()); // step could have been changed
-    rxFrequency += (n * getStep());
+    auto mode = I2Cinput::getInstance()->getMode();
 
-    if (rxFrequency > F_MAX)
+    if (mode != ctcss)
     {
-        rxFrequency = F_MIN + rxFrequency - F_MAX - getStep();
-    }
-    else if (rxFrequency < F_MIN)
-    {
-        rxFrequency = F_MAX - (rxFrequency - F_MIN) + getStep();
+        frequencyUp(n);
     }
 }
 
@@ -92,6 +87,21 @@ std::string TrxState::getStepToString() const
     else
     {
         return std::to_string(getStep());
+    }
+}
+
+void TrxState::frequencyUp(int n)
+{
+    rxFrequency -= (rxFrequency % getStep()); // step could have been changed
+    rxFrequency += (n * getStep());
+
+    if (rxFrequency > F_MAX)
+    {
+        rxFrequency = F_MIN + rxFrequency - F_MAX - getStep();
+    }
+    else if (rxFrequency < F_MIN)
+    {
+        rxFrequency = F_MAX - (rxFrequency - F_MIN) + getStep();
     }
 }
 

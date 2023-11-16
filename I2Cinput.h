@@ -19,6 +19,8 @@ private:
     uint8_t byte1; // IC3
     uint8_t byte2; // IC4
 
+    mode getModePrivate();
+
     I2Cinput();                              
     I2Cinput(const I2Cinput&);                   // disable copy constructor              
     I2Cinput & operator = (const I2Cinput &);    // disable operator =
