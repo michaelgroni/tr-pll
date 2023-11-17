@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+set(PICO_CXX_ENABLE_RTTI 1)
 
 # Initialise pico_sdk from installed location
 # (note this can come from environment, CMake cache etc)
@@ -14,7 +15,7 @@ set(PICO_BOARD pico CACHE STRING "Board type")
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-if (PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0")
+if (PICO_SDK_VERSION_STRING VERSION_LESS "1.4.0") 
   message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.4.0 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
 
@@ -57,7 +58,7 @@ add_library(TrxStateVfo TrxStateVfo.cpp)
 target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c hardware_spi hardware_pio)
 
 add_library(Display Display.cpp)
-target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio)
+target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo)
 
 add_library(GPIOinput GPIOinput.cpp)
 target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio)
@@ -80,6 +81,7 @@ target_link_libraries(ADF4351 settings pico_stdlib hardware_spi hardware_pio)
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
+        pico_stdlib
         hardware_i2c
         hardware_spi
         hardware_pio

@@ -4,10 +4,25 @@
 
 
 TrxStateVfo::TrxStateVfo(uint32_t rxFrequency)
-: TrxState(rxFrequency)
 {
+    if (rxFrequency < F_MIN)
+    {
+        this->rxFrequency = F_MIN;
+    }
+    else if (rxFrequency > F_MAX)
+    {
+        this->rxFrequency = F_MAX;
+    }
+    else
+    {
+        this->rxFrequency = rxFrequency;
+    }    
 }
 
+uint32_t TrxStateVfo::getRxFrequency() const
+{
+    return rxFrequency;
+}
 
 uint32_t TrxStateVfo::getTxFrequency() const
 {
@@ -19,4 +34,96 @@ uint32_t TrxStateVfo::getTxFrequency() const
 bool TrxStateVfo::isCtcssOn() const
 {
     return I2Cinput::getInstance()->getMode() == ctcss;
+}
+
+
+double TrxStateVfo::getCtcssFrequency() const
+{
+    return ctcssValues.at(ctcssIndex);
+}
+
+
+void TrxStateVfo::up(int n)
+{
+    auto mode = I2Cinput::getInstance()->getMode();
+
+    if (mode != ctcss)
+    {
+        frequencyUp(n);
+    }
+}
+
+
+void TrxStateVfo::frequencyUp(int n)
+{
+    rxFrequency -= (rxFrequency % getStep()); // step could have been changed
+    rxFrequency += (n * getStep());
+
+    if (rxFrequency > F_MAX)
+    {
+        rxFrequency = F_MIN + rxFrequency - F_MAX - getStep();
+    }
+    else if (rxFrequency < F_MIN)
+    {
+        rxFrequency = F_MAX - (rxFrequency - F_MIN) + getStep();
+    }
+}
+
+void TrxStateVfo::stepUp()
+{
+    if (stepIndex == steps.size() - 1)
+    {
+        stepIndex = 0;
+    }
+    else
+    {
+        stepIndex++;
+    }
+}
+
+
+void TrxStateVfo::stepDown()
+{
+    if (stepIndex == 0)
+    {
+        stepIndex = steps.size() -1;
+    }
+    else
+    {
+        stepIndex--;
+    }
+}
+
+unsigned int TrxStateVfo::getStep() const
+{
+    if (stepIndex==0) // auto
+    {
+        auto mode = I2Cinput::getInstance()->getMode();
+
+        if ((mode==fm2) || (mode==ctcss))
+        {
+            return 12500;
+        }
+        else
+        {
+            return 1000;
+        }
+    }
+    else
+    {
+        return steps.at(stepIndex);
+    }
+}
+
+
+std::string TrxStateVfo::getStepToString() const
+{
+    if (stepIndex == 0)
+    {
+        return "auto";
+    }
+    else
+    {
+        return std::to_string(getStep());
+    }
 }

@@ -10,7 +10,7 @@ class Display
 {
 public:
     static Display* getInstance();
-    void update(const TrxState& trxState);
+    void update(TrxState& trxState);
 
 private:
     uint32_t frequency = 0;
