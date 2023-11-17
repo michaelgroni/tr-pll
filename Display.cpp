@@ -153,7 +153,7 @@ void Display::drawDigit(uint8_t x, uint8_t y, uint digit)
     }
 }
 
-void Display::setFrequency(uint32_t frequency)
+void Display::setFrequency(const uint32_t frequency)
 {
     this->frequency = frequency;
 

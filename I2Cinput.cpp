@@ -33,8 +33,8 @@ mode I2Cinput::getMode()
 
     if (m == usb) // mode is USB/CW or the switch is being moved at the moment
     {
-        sleep_ms(DEBOUNCE_TIME);
-        update();
+        sleep_ms(6);
+        i2c_read_blocking(I2C_PORT, IC3_ADDR, &byte1, 1, false);
         return getModePrivate();
     }
     else

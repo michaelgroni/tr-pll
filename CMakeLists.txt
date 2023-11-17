@@ -86,7 +86,7 @@ target_link_libraries(tr-pll
         hardware_spi
         hardware_pio
         hardware_clocks
-        hardware_timer
+        # hardware_timer
         TrxState
         TrxStateVfo
         Display

@@ -24,7 +24,7 @@ private:
     pico_ssd1306::SSD1306 oled = pico_ssd1306::SSD1306(I2C_PORT, OLED_ADDRESS, pico_ssd1306::Size::W128xH32);
 
     void drawDigit(uint8_t x, uint8_t y, uint digit);
-    void setFrequency(uint32_t frequency);
+    void setFrequency(const uint32_t frequency);
     void setLine2(const std::string line2);
     void setInfoNortheast(const char c);
 };
