@@ -1,7 +1,7 @@
 #include "TrxStateVfo.h"
 
 #include "I2Cinput.h"
-
+#include "GPIOinput.h"
 
 TrxStateVfo::TrxStateVfo(uint32_t rxFrequency)
 {
@@ -21,13 +21,28 @@ TrxStateVfo::TrxStateVfo(uint32_t rxFrequency)
 
 uint32_t TrxStateVfo::getRxFrequency() const
 {
-    return rxFrequency;
+    if (!isPressed("reverse"))
+    {
+        return rxFrequency;
+    }
+    else
+    {
+        auto offset = I2Cinput::getInstance()->getDuplexOffset();
+        return rxFrequency + offset;
+    }
 }
 
 uint32_t TrxStateVfo::getTxFrequency() const
 {
-    auto offset = I2Cinput::getInstance()->getDuplexOffset();
-    return getRxFrequency() + offset;
+    if (!isPressed("reverse"))
+    {
+        auto offset = I2Cinput::getInstance()->getDuplexOffset();
+        return getRxFrequency() + offset;
+    }
+    else
+    {
+        return rxFrequency;
+    }
 }
 
 
