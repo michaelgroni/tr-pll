@@ -2,7 +2,6 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/pio.h"
-#include "hardware/clocks.h"
 // #include "hardware/timer.h"
 
 #include "pico-ssd1306/ssd1306.h"
@@ -16,8 +15,6 @@
 #include "MCP4725.h"
 #include "ADF4351.h"
 #include "rotaryEncoder.pio.h"
-#include "beep.pio.h"
-#include "ctcss.pio.h"
 
 
 int main()
@@ -57,26 +54,6 @@ int main()
     pio_sm_set_enabled(ROTARY_PIO, rotarySm, true); 
 
 
-    // setup beep pio
-    uint beepOffset = pio_add_program(BEEP_PIO, &beep_program);
-    uint beepSm = pio_claim_unused_sm(BEEP_PIO, true);
-    pio_sm_config beepConfig = beep_program_get_default_config(beepOffset);
-    sm_config_set_set_pins(&beepConfig, BEEP_PIN, 1);
-    pio_gpio_init(BEEP_PIO, BEEP_PIN);
-    pio_sm_init(BEEP_PIO, beepSm, beepOffset, &beepConfig);
-    pio_sm_set_enabled(BEEP_PIO, beepSm, false); 
-    
-    
-    // setup ctcss pio
-    uint ctcssOffset = pio_add_program(CTCSS_PIO, &ctcss_program);
-    uint ctcssSm = pio_claim_unused_sm(CTCSS_PIO, true);
-    pio_sm_config ctcssConfig = ctcss_program_get_default_config(ctcssOffset);
-    sm_config_set_set_pins(&ctcssConfig, CTCSS_PIN, 1);
-    pio_gpio_init(CTCSS_PIO, CTCSS_PIN);
-    pio_sm_init(CTCSS_PIO, ctcssSm, ctcssOffset, &ctcssConfig);
-    pio_sm_set_enabled(CTCSS_PIO, ctcssSm, false);
-
-
     auto i2cInput = I2Cinput::getInstance();
 
     TrxStateVfo vfoA(VFO_A_INIT);
@@ -86,16 +63,8 @@ int main()
     setTxAllowed(false);
     TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
 
-    beepOK(&beepConfig, beepSm);
+    Piezo::getInstance()->beepOK();
 
-    /*
-    const double fCtcss = 151.4;
-    const uint cycles = 180;
-    const auto sysClock = clock_get_hz(clk_sys);
-    const double clkDiv = sysClock / (fCtcss * cycles);
-    pio_sm_set_clkdiv(CTCSS_PIO, ctcssSm, clkDiv);
-    pio_sm_set_enabled(CTCSS_PIO, ctcssSm, true);
-    */
 
     // main loop
     while (true)
@@ -116,25 +85,25 @@ int main()
         if (wasPressed("stepIncrease") && isPressed("stepIncrease")) // read event and state to avoid crosstalk effects
         {
             currentState->stepUp();
-            beepOK(&beepConfig, beepSm);
+            Piezo::getInstance()->beepOK();
 
         }
         if (wasPressed("stepDecrease") && isPressed("stepDecrease"))
         {
             currentState->stepDown();
-            beepOK(&beepConfig, beepSm);
+            Piezo::getInstance()->beepOK();
         }        
 
         // read up and down buttons
         if (wasPressed("micUp") && isPressed("micUp")) // read event and state to avoid crosstalk effects
         {
             updown++;
-            beepOK(&beepConfig, beepSm);
+            Piezo::getInstance()->beepOK();
         }
         if (wasPressed("micDown") && isPressed("micDown"))
         {
             updown--;
-            beepOK(&beepConfig, beepSm);
+            Piezo::getInstance()->beepOK();
         }
         
         if (!isPressed("ptt"))
