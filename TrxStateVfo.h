@@ -27,6 +27,7 @@ private:
     size_t ctcssIndex = 20;
 
     void frequencyUp(int n); // negative n for down
+    void ctcssUp(int n); // negative n for down
 
     // available steps
     const std::array<unsigned int, 8> steps = {0, 10, 100, 1000, 10000, 12500, 100000, 1000000}; // 0 means auto

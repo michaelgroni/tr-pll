@@ -51,6 +51,29 @@ void TrxStateVfo::up(int n)
     {
         frequencyUp(n);
     }
+    else // ctcss
+    {
+        ctcssUp(n);
+    }
+}
+
+void TrxStateVfo::ctcssUp(int n)
+{
+    if (n>=0)
+    {
+        ctcssIndex = (ctcssIndex + n) % ctcssValues.size();
+    }
+    else // n<0
+    {
+        if (ctcssIndex >= -n)
+        {
+            ctcssIndex += n; 
+        }
+        else
+        {
+            ctcssIndex = ctcssValues.size() + n + ctcssIndex;
+        }
+    }
 }
 
 
