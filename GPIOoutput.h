@@ -2,6 +2,8 @@
 
 #include "hardware/pio.h"
 
+#include "TrxState.h"
+
 void setTxAllowed(bool allowed);
 
 void beepOK(pio_sm_config *c, uint sm);
@@ -24,9 +26,14 @@ class Ctcss
 {
 public:
     static Ctcss* getInstance();
-    void on(const double frequency) const;
-    void off() const;
+    void update(TrxState &trxState);
+
 private:
     Ctcss();
-    uint ctcssSm; // state machin
+    uint ctcssSm; // state machine
+    void setOn(const double frequency);
+    void setOff();
+
+    double frequency = 0;
+    bool on = false;
 };

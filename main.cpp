@@ -122,8 +122,9 @@ int main()
 
         
 
-        // update display
+        // update display and ctcss encoder
         Display::getInstance()->update(*currentState);
+        Ctcss::getInstance()->update(*currentState);
 
         // configure pll and tune drive unit
         ADF4351::getInstance()->write(currentState->getCurrentFrequency());

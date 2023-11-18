@@ -89,16 +89,32 @@ Ctcss::Ctcss()
     pio_sm_set_enabled(CTCSS_PIO, ctcssSm, false);  
 }
 
-void Ctcss::on(const double frequency) const
+void Ctcss::update(TrxState &trxState)
+{
+    if (!trxState.isCtcssOn())
+    {
+        if (on) setOff();
+    }
+    else // CTCSS on
+    {
+        double frequency = trxState.getCtcssFrequency();
+        if ((frequency != this->frequency) || !on) setOn(frequency);
+    }
+}
+
+void Ctcss::setOn(const double frequency)
 {
     const auto sysClock = clock_get_hz(clk_sys);
     const uint cycles = 180;
     const double clkDiv = sysClock / (frequency * cycles);
     pio_sm_set_clkdiv(CTCSS_PIO, ctcssSm, clkDiv);
     pio_sm_set_enabled(CTCSS_PIO, ctcssSm, true);  
+    this->frequency = frequency;
+    on = true;
 }
 
-void Ctcss::off() const
+void Ctcss::setOff()
 {
     pio_sm_set_enabled(CTCSS_PIO, ctcssSm, false);
+    on = false;
 }
