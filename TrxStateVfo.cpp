@@ -103,7 +103,7 @@ void TrxStateVfo::frequencyUp(int n)
     }
     else if (rxFrequency < F_MIN)
     {
-        rxFrequency = F_MAX - (rxFrequency - F_MIN) + getStep();
+        rxFrequency = F_MAX - (rxFrequency - F_MIN) - getStep();
     }
 }
 
