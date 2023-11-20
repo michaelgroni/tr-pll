@@ -8,11 +8,11 @@
 
 void Scanner::update(TrxStateVfo *trxStateVfo)
 {
-    sleep_ms(20); // wait for the pll
+    sleep_ms(SCANNER_WAIT_PLL_TIME); // wait for the pll
 
     if (wasOpen)
     {
-        sleep_ms(65); // wait for the squelch to close
+        sleep_ms(SCANNER_WAIT_SQUELCH_TIME); // wait for the squelch to close
         wasOpen = false;
     }
 
@@ -22,7 +22,7 @@ void Scanner::update(TrxStateVfo *trxStateVfo)
         wasOpen = true;
         for (int i = 0; (i < 10) && isOn(); i++)
         {
-            sleep_ms(SCANNER_WAIT_TIME / 10);
+            sleep_ms(SCANNER_WAIT_QSO_TIME / 10);
             if (wasPressed("ptt") || wasPressed("rotaryButton"))
             {
                 Piezo::getInstance()->beepOK();
