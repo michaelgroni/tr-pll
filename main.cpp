@@ -107,12 +107,13 @@ int main()
             updown--;
             Piezo::getInstance()->beepOK();
         }
-        
+
+        auto mode = I2Cinput::getInstance()->getMode();
 
         TrxStateVfo* tsv = dynamic_cast<TrxStateVfo*>(currentState);
         if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
         {
-            if (isPressed("ptt") || (tsv == nullptr))
+            if (isPressed("ptt") || (tsv == nullptr) || (mode == ctcss))
             {
                 Piezo::getInstance()->beepError();
             }
@@ -129,7 +130,7 @@ int main()
         }
         else if (scanner.isOn())
         {
-            if (isPressed("ptt"))
+            if (isPressed("ptt") || (mode == ctcss))
             {
                 scanner.setOn(false);
                 Piezo::getInstance()->beepOK();
@@ -163,7 +164,7 @@ int main()
         
 
         // update peripherals
-        Display::getInstance()->update(*currentState);
+        Display::getInstance()->update(*currentState, scanner);
         ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
         if (!scanner.isOn())
         {

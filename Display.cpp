@@ -14,7 +14,7 @@ Display::Display()
     oled.setContrast(OLED_CONTRAST);
 }
 
-void Display::update(TrxState &trxState)
+void Display::update(TrxState &trxState, const Scanner &scanner)
 {
     bool changed = false;
 
@@ -78,6 +78,19 @@ void Display::update(TrxState &trxState)
         setLine2(newLine2);
         changed = true;
     }
+
+
+    // line 3
+    if (scanner.isOn() && (line3.compare("scan") != 0))
+    {
+        setLine3("scan");
+        changed = true;
+    }
+    if (!scanner.isOn() && (line3.compare("") != 0))
+    {
+        setLine3("");
+        changed = true;
+    }    
 
 
     if (changed)
@@ -186,6 +199,14 @@ void Display::setLine2(const std::string line2)
 
     fillRect(&oled, 0, 17, 128, 24, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
     drawText(&oled, font_8x8, line2.c_str(), 0, 17);
+}
+
+void Display::setLine3(const std::string line3)
+{
+    this->line3 = line3;
+
+    fillRect(&oled, 0, 25, 128, 32, pico_ssd1306::WriteMode::SUBTRACT); // overwrite old content
+    drawText(&oled, font_8x8, line3.c_str(), 0, 25);
 }
 
 void Display::setInfoNortheast(const char c)

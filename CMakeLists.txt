@@ -55,9 +55,6 @@ target_link_libraries(settings pico_stdlib hardware_i2c hardware_spi hardware_pi
 add_library(TrxStateVfo TrxStateVfo.cpp)
 target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c hardware_spi hardware_pio)
 
-add_library(Display Display.cpp)
-target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo)
-
 add_library(GPIOinput GPIOinput.cpp)
 target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio)
 
@@ -80,6 +77,9 @@ target_link_libraries(ADF4351 settings pico_stdlib hardware_spi hardware_pio)
 
 add_library(Scanner Scanner.cpp)
 target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput hardware_timer)
+
+add_library(Display Display.cpp)
+target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo Scanner)
 
 
 # Add any user requested libraries

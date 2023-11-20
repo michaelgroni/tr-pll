@@ -15,5 +15,5 @@ public:
     void update(TrxStateVfo* trxStateVfo);
     void setUp(bool up);
     void setOn(bool on);
-    bool isOn();
+    bool isOn() const;
 };
