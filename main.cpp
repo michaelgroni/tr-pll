@@ -15,6 +15,7 @@
 #include "MCP4725.h"
 #include "ADF4351.h"
 #include "rotaryEncoder.pio.h"
+#include "Scanner.h"
 
 
 int main()
@@ -59,6 +60,7 @@ int main()
     TrxStateVfo vfoA(VFO_A_INIT);
     TrxStateVfo vfoB(VFO_B_INIT);
 
+    Scanner scanner;
 
     setTxAllowed(false);
     TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
@@ -106,7 +108,45 @@ int main()
             Piezo::getInstance()->beepOK();
         }
         
-        if (!isPressed("ptt"))
+
+        TrxStateVfo* tsv = dynamic_cast<TrxStateVfo*>(currentState);
+        if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
+        {
+            if (isPressed("ptt") || (tsv == nullptr))
+            {
+                Piezo::getInstance()->beepError();
+            }
+            else if (scanner.isOn())
+            {
+                Piezo::getInstance()->beepOK();
+                scanner.setOn(false);    
+            }
+            else // scanner is off and scan is allowed
+            {
+                scanner.setOn(true);
+                Piezo::getInstance()->beepOK();
+            }
+        }
+        else if (scanner.isOn())
+        {
+            if (isPressed("ptt"))
+            {
+                scanner.setOn(false);
+                Piezo::getInstance()->beepOK();
+            }
+            else
+            {
+                setTxAllowed(false);
+
+                if (updown != 0)
+                {
+                    scanner.setUp(updown > 0);
+                }
+
+                scanner.update(tsv);
+            }
+        }
+        else if (!isPressed("ptt"))
         {
             setTxAllowed(false);
 
@@ -122,14 +162,15 @@ int main()
 
         
 
-        // update display and ctcss encoder
+        // update peripherals
         Display::getInstance()->update(*currentState);
-        Ctcss::getInstance()->update(*currentState);
+        ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
+        if (!scanner.isOn())
+        {
+            writeDAC(dacValue(dacVoltage(currentState->getTxFrequency()))); // tune drive unit
+            Ctcss::getInstance()->update(*currentState);
+        }
 
-        // configure pll and tune drive unit
-        ADF4351::getInstance()->write(currentState->getCurrentFrequency());
-        writeDAC(dacValue(dacVoltage(currentState->getTxFrequency())));
-
-        setTxAllowed(currentState->isTxAllowed());
+        setTxAllowed(currentState->isTxAllowed() && !scanner.isOn());
     }
 }

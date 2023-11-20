@@ -15,8 +15,10 @@ inline const uint32_t F_MAX_TX = 146000000;
 inline const uint32_t VFO_A_INIT = 145400000;
 inline const uint32_t VFO_B_INIT = 144375000;
 
-// debouncing
-// inline const uint32_t DEBOUNCE_TIME = 200; // milliseconds
+
+// waiting times in milliseconds
+// inline const uint32_t DEBOUNCE_TIME = 200;
+inline const uint32_t SCANNER_WAIT_TIME = 4000;
 
 // I2C bus
 inline const uint8_t I2C_SDA = 0;
@@ -60,7 +62,8 @@ inline const std::unordered_map<std::string, uint> gpioInPins =
     {"mr", 8}, // memory read switch
     {"ms", 9}, // memory scan swith
     {"ab", 11}, // pressed = VFO B - not pressed = VFO A
-    {"reverse", 18}
+    {"reverse", 18},
+    {"squelchOpen", 21}
 };
 
 // rotary encoder pio input pins

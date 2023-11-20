@@ -78,6 +78,9 @@ target_link_libraries(MCP4725 settings pico_stdlib hardware_i2c hardware_spi har
 add_library(ADF4351 ADF4351.cpp)
 target_link_libraries(ADF4351 settings pico_stdlib hardware_spi hardware_pio)
 
+add_library(Scanner Scanner.cpp)
+target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput hardware_timer)
+
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
@@ -95,6 +98,7 @@ target_link_libraries(tr-pll
         settings
         MCP4725
         ADF4351
+        Scanner
         )
 
 pico_add_extra_outputs(tr-pll)

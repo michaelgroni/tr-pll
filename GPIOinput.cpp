@@ -22,3 +22,9 @@ bool wasPressed(std::string pinName)
         return false;
     }
 }
+
+bool isSquelchOpen()
+{
+    auto pin = gpioInPins.at("squelchOpen");
+    return gpio_get(pin);
+}
