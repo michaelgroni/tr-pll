@@ -59,10 +59,13 @@ add_library(GPIOinput GPIOinput.cpp)
 target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio)
 
 add_library(I2Cinput I2Cinput.cpp)
-target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio hardware_timer) 
+target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio hardware_timer)
+
+add_library(memory memory.cpp)
+target_link_libraries(memory pico_stdlib)
 
 add_library(TrxState TrxState.cpp)
-target_link_libraries(TrxState pico_stdlib hardware_i2c settings hardware_spi hardware_pio I2Cinput)
+target_link_libraries(TrxState pico_stdlib hardware_i2c settings hardware_spi hardware_pio I2Cinput memory)
 
 add_library(GPIOoutput GPIOoutput.cpp)
 target_link_libraries(GPIOoutput settings TrxState pico_stdlib hardware_timer hardware_pio hardware_clocks)
