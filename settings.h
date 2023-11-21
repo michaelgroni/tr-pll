@@ -6,6 +6,13 @@
 #include "hardware/i2c.h"
 #include "hardware/spi.h"
 #include "hardware/pio.h"
+#include "hardware/flash.h"
+
+
+// memory
+inline const uint32_t MY_FLASH_OFFSET = 510 * FLASH_SECTOR_SIZE;
+inline const uint32_t MY_FLASH_DATA = MY_FLASH_OFFSET + FLASH_SECTOR_SIZE;
+
 
 // frequencies
 inline const uint32_t F_MIN = 143000000;

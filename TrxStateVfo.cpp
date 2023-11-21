@@ -5,6 +5,11 @@
 
 TrxStateVfo::TrxStateVfo(uint32_t rxFrequency)
 {
+   setRxFrequency(rxFrequency);
+}
+
+void TrxStateVfo::setRxFrequency(uint32_t rxFrequency)
+{
     if (rxFrequency < F_MIN)
     {
         this->rxFrequency = F_MIN;
@@ -16,7 +21,7 @@ TrxStateVfo::TrxStateVfo(uint32_t rxFrequency)
     else
     {
         this->rxFrequency = rxFrequency;
-    }    
+    } 
 }
 
 uint32_t TrxStateVfo::getRxFrequency() const

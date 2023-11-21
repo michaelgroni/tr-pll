@@ -50,7 +50,7 @@ add_subdirectory(pico-ssd1306) # OLED
 target_link_libraries(tr-pll pico_ssd1306 hardware_i2c)
 
 add_library(settings settings.cpp)
-target_link_libraries(settings pico_stdlib hardware_i2c hardware_spi hardware_pio)
+target_link_libraries(settings pico_stdlib hardware_i2c hardware_spi hardware_pio hardware_flash)
 
 add_library(TrxStateVfo TrxStateVfo.cpp)
 target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c hardware_spi hardware_pio)
@@ -62,7 +62,7 @@ add_library(I2Cinput I2Cinput.cpp)
 target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio hardware_timer)
 
 add_library(memory memory.cpp)
-target_link_libraries(memory pico_stdlib)
+target_link_libraries(memory settings pico_stdlib hardware_flash hardware_sync)
 
 add_library(TrxState TrxState.cpp)
 target_link_libraries(TrxState pico_stdlib hardware_i2c settings hardware_spi hardware_pio I2Cinput memory)
@@ -79,7 +79,7 @@ add_library(ADF4351 ADF4351.cpp)
 target_link_libraries(ADF4351 settings pico_stdlib hardware_spi hardware_pio)
 
 add_library(Scanner Scanner.cpp)
-target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput hardware_timer)
+target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput memory hardware_timer)
 
 add_library(Display Display.cpp)
 target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo Scanner)
@@ -91,7 +91,6 @@ target_link_libraries(tr-pll
         hardware_i2c
         hardware_spi
         hardware_pio
-        # hardware_timer
         TrxState
         TrxStateVfo
         Display

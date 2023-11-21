@@ -4,6 +4,7 @@
 
 #include "GPIOinput.h"
 #include "GPIOoutput.h"
+#include "memory.h"
 
 
 void Scanner::update(TrxStateVfo *trxStateVfo)
@@ -36,10 +37,18 @@ void Scanner::update(TrxStateVfo *trxStateVfo)
         if (up)
         {
             trxStateVfo->up(1);
+            if (trxStateVfo->getRxFrequency() > scanMax())
+            {
+                trxStateVfo->setRxFrequency(scanMin());
+            }
         }
         else
         {
             trxStateVfo->up(-1);
+            if (trxStateVfo->getRxFrequency() < scanMin())
+            {
+                trxStateVfo->setRxFrequency(scanMax());
+            }
         }
     }
 }

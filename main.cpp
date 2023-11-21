@@ -2,7 +2,6 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/pio.h"
-// #include "hardware/timer.h"
 
 #include "pico-ssd1306/ssd1306.h"
 
@@ -16,6 +15,7 @@
 #include "ADF4351.h"
 #include "rotaryEncoder.pio.h"
 #include "Scanner.h"
+
 
 
 int main()
@@ -66,6 +66,8 @@ int main()
     TrxState *currentState = isPressed("ab") ? &vfoB : &vfoA;
 
     Piezo::getInstance()->beepOK();
+
+    flashInit();
 
 
     // main loop
