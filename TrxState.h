@@ -13,11 +13,13 @@ public:
     virtual uint32_t getRxFrequency() const = 0;
     virtual uint32_t getTxFrequency() const = 0;
     virtual void up(int n) = 0;
-    virtual void stepUp() = 0;
-    virtual void stepDown() = 0;
+    void stepUp();
+    void stepDown();
+    unsigned int getStep() const;
+    std::string getStepToString() const;
 
-    uint32_t getCurrentFrequency() const;
-    bool isTxAllowed() const;
+    virtual uint32_t getCurrentFrequency() const;
+    virtual bool isTxAllowed() const;
 
     virtual bool isCtcssOn() const = 0;
     virtual double getCtcssFrequency() const = 0;
@@ -30,4 +32,9 @@ protected:
         107.2, 110.9, 114.8, 118.8, 123, 127.3, 131.8, 136.5, 141.3, 146.2, 151.4, 156.7, 162.2, 167.9, 173.8, 179.9,
         186.2, 192.8, 203.5, 210.7, 218.1, 225.7, 233.6, 241.8, 250.3};
     size_t ctcssIndex = 20;
+
+private:    
+    // available steps
+    const std::array<unsigned int, 8> steps = {0, 10, 100, 1000, 10000, 12500, 100000, 1000000}; // 0 means auto
+    size_t stepIndex = 0; // auto
 };

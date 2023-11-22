@@ -16,8 +16,6 @@
 #include "rotaryEncoder.pio.h"
 #include "Scanner.h"
 
-
-
 int main()
 {
     // setup I2C
@@ -38,7 +36,6 @@ int main()
     gpio_init(TX_FORBIDDEN_PIN);
     gpio_set_dir(TX_FORBIDDEN_PIN, true);
 
-
     // setup rotary encoder pio
     gpio_pull_up(ROTARY_CLOCK);
     gpio_pull_up(ROTARY_DATA);
@@ -52,8 +49,7 @@ int main()
     sm_config_set_fifo_join(&rotaryConfig, PIO_FIFO_JOIN_RX);
     sm_config_set_in_shift(&rotaryConfig, false, false, 0);
     pio_sm_init(ROTARY_PIO, rotarySm, rotaryOffset, &rotaryConfig);
-    pio_sm_set_enabled(ROTARY_PIO, rotarySm, true); 
-
+    pio_sm_set_enabled(ROTARY_PIO, rotarySm, true);
 
     auto i2cInput = I2Cinput::getInstance();
 
@@ -69,7 +65,6 @@ int main()
 
     flashInit();
 
-
     // main loop
     while (true)
     {
@@ -78,92 +73,78 @@ int main()
         // read I²C input
         i2cInput->update(); // must be called in the main loop
 
-        // read rotary encoder
-        int updown = 0;
-        while (!pio_sm_is_rx_fifo_empty(ROTARY_PIO, rotarySm))
-        {
-            updown += (int32_t) pio_sm_get(ROTARY_PIO, rotarySm);
-        }
+        // read rotary encoder and up/down buttons
+        int updown = readRotaryEncoder(rotarySm);
+        updown += readUpDownButtons();
 
         // read step buttons
         if (wasPressed("stepIncrease") && isPressed("stepIncrease")) // read event and state to avoid crosstalk effects
         {
             currentState->stepUp();
             Piezo::getInstance()->beepOK();
-
         }
         if (wasPressed("stepDecrease") && isPressed("stepDecrease"))
         {
             currentState->stepDown();
             Piezo::getInstance()->beepOK();
-        }        
-
-        // read up and down buttons
-        if (wasPressed("micUp") && isPressed("micUp")) // read event and state to avoid crosstalk effects
-        {
-            updown++;
-            Piezo::getInstance()->beepOK();
-        }
-        if (wasPressed("micDown") && isPressed("micDown"))
-        {
-            updown--;
-            Piezo::getInstance()->beepOK();
         }
 
         auto mode = I2Cinput::getInstance()->getMode();
 
-        TrxStateVfo* tsv = dynamic_cast<TrxStateVfo*>(currentState);
-        if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
+        switch (I2Cinput::getInstance()->getMemoryChannel())
         {
-            if (isPressed("ptt") || (tsv == nullptr) || (mode == ctcss))
+        default:
+            TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(currentState);
+            if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
             {
-                Piezo::getInstance()->beepError();
+                if (isPressed("ptt") || (tsv == nullptr) || (mode == ctcss))
+                {
+                    Piezo::getInstance()->beepError();
+                }
+                else if (scanner.isOn())
+                {
+                    Piezo::getInstance()->beepOK();
+                    scanner.setOn(false);
+                }
+                else // scanner is off and scan is allowed
+                {
+                    scanner.setOn(true);
+                    Piezo::getInstance()->beepOK();
+                }
             }
             else if (scanner.isOn())
             {
-                Piezo::getInstance()->beepOK();
-                scanner.setOn(false);    
+                if (isPressed("ptt") || (mode == ctcss))
+                {
+                    scanner.setOn(false);
+                    Piezo::getInstance()->beepOK();
+                }
+                else
+                {
+                    setTxAllowed(false);
+
+                    if (updown != 0)
+                    {
+                        scanner.setUp(updown > 0);
+                    }
+
+                    scanner.update(tsv);
+                }
             }
-            else // scanner is off and scan is allowed
-            {
-                scanner.setOn(true);
-                Piezo::getInstance()->beepOK();
-            }
-        }
-        else if (scanner.isOn())
-        {
-            if (isPressed("ptt") || (mode == ctcss))
-            {
-                scanner.setOn(false);
-                Piezo::getInstance()->beepOK();
-            }
-            else
+            else if (!isPressed("ptt"))
             {
                 setTxAllowed(false);
 
-                if (updown != 0)
-                {
-                    scanner.setUp(updown > 0);
-                }
-
-                scanner.update(tsv);
+                // read vfo switch
+                currentState = isPressed("ab") ? &vfoB : &vfoA;
+                currentState->up(updown);
+            }
+            else // PTT pressed
+            // The VFO wheel and the UP/DOWN buttons should work always in SSB and CW.
+            {
+                // TODO
             }
         }
-        else if (!isPressed("ptt"))
-        {
-            setTxAllowed(false);
-
-            // read vfo switch
-            currentState = isPressed("ab") ? &vfoB : &vfoA;  
-            currentState->up(updown);
-        }
-        else // PTT pressed
-        // The VFO wheel and the UP/DOWN buttons should work always in SSB and CW.
-        {
-            // TODO
-        }
-
-        
 
         // update peripherals
         Display::getInstance()->update(*currentState, scanner);

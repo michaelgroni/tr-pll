@@ -55,9 +55,6 @@ target_link_libraries(settings pico_stdlib hardware_i2c hardware_spi hardware_pi
 add_library(TrxStateVfo TrxStateVfo.cpp)
 target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c hardware_spi hardware_pio)
 
-add_library(GPIOinput GPIOinput.cpp)
-target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio)
-
 add_library(I2Cinput I2Cinput.cpp)
 target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio hardware_timer)
 
@@ -72,6 +69,9 @@ target_link_libraries(GPIOoutput settings TrxState pico_stdlib hardware_timer ha
 pico_generate_pio_header(GPIOoutput ${CMAKE_CURRENT_LIST_DIR}/beep.pio)
 pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/ctcss.pio)
 
+add_library(GPIOinput GPIOinput.cpp)
+target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio GPIOoutput)
+
 add_library(MCP4725 MCP4725.cpp)
 target_link_libraries(MCP4725 settings pico_stdlib hardware_i2c hardware_spi hardware_pio)
 
@@ -84,6 +84,8 @@ target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput memory h
 add_library(Display Display.cpp)
 target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo Scanner)
 
+add_library(TrxStateSpecialMemory TrxStateSpecialMemory.cpp)
+target_link_libraries(TrxStateSpecialMemory TrxState)
 
 # Add any user requested libraries
 target_link_libraries(tr-pll

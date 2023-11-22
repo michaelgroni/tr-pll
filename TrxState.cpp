@@ -17,6 +17,64 @@ uint32_t TrxState::getCurrentFrequency() const
     }
 }
 
+void TrxState::stepUp()
+{
+    if (stepIndex == steps.size() - 1)
+    {
+        stepIndex = 0;
+    }
+    else
+    {
+        stepIndex++;
+    }
+}
+
+
+void TrxState::stepDown()
+{
+    if (stepIndex == 0)
+    {
+        stepIndex = steps.size() -1;
+    }
+    else
+    {
+        stepIndex--;
+    }
+}
+
+unsigned int TrxState::getStep() const
+{
+    if (stepIndex==0) // auto
+    {
+        auto mode = I2Cinput::getInstance()->getMode();
+
+        if ((mode==fm2) || (mode==ctcss))
+        {
+            return 12500;
+        }
+        else
+        {
+            return 1000;
+        }
+    }
+    else
+    {
+        return steps.at(stepIndex);
+    }
+}
+
+
+std::string TrxState::getStepToString() const
+{
+    if (stepIndex == 0)
+    {
+        return "auto";
+    }
+    else
+    {
+        return std::to_string(getStep());
+    }
+}
 
 
 bool TrxState::isTxAllowed() const
@@ -35,7 +93,3 @@ memory TrxState::toMemory() const
     m.ctcssOn = isCtcssOn();
     return m;
 }
-
-
-
-

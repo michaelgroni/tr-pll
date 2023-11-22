@@ -1,18 +1,17 @@
 {
   "cmake.configureOnOpen": false,
-  "cmake.statusbar.advanced": {
-    "debug" : {
-      "visibility": "hidden"
-              },    "launch" : {
-      "visibility": "hidden"
-               },
-    "build" : {
-      "visibility": "hidden"
-               },
-    "buildTarget" : {
-      "visibility": "hidden"
-               },
-    },
+    "cmake.options.statusBarVisibility": "visible",
+    "cmake.options.advanced": {
+      "build": {
+        "statusBarVisibility": "visible"
+      },
+      "launch": {
+        "statusBarVisibility": "visible"
+      },
+      "debug": {
+        "statusBarVisibility": "visible"
+    }
+},
     "files.associations": {
       "array": "cpp",
       "atomic": "cpp",

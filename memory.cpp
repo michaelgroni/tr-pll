@@ -31,7 +31,7 @@ void flashInit()
 
         // write flash data
         flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes
-        flash_range_program(MY_FLASH_OFFSET, (uint8_t*) &scannerConfig, FLASH_PAGE_SIZE);
+        flash_range_program(MY_FLASH_DATA, (uint8_t*) &scannerConfig, FLASH_PAGE_SIZE);
         
         restore_interrupts (interruptState);
     }
