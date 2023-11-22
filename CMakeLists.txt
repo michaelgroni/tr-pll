@@ -87,6 +87,9 @@ target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi
 add_library(TrxStateSpecialMemory TrxStateSpecialMemory.cpp)
 target_link_libraries(TrxStateSpecialMemory TrxState)
 
+add_library(TrxStateScanMin TrxStateScanMin.cpp)
+target_link_libraries(TrxStateScanMin TrxStateSpecialMemory)
+
 # Add any user requested libraries
 target_link_libraries(tr-pll
         pico_stdlib

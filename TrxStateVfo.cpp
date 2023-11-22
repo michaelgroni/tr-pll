@@ -57,11 +57,6 @@ bool TrxStateVfo::isCtcssOn() const
 }
 
 
-double TrxStateVfo::getCtcssFrequency() const
-{
-    return ctcssValues.at(ctcssIndex);
-}
-
 
 void TrxStateVfo::up(int n)
 {

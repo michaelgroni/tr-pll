@@ -22,7 +22,7 @@ public:
     virtual bool isTxAllowed() const;
 
     virtual bool isCtcssOn() const = 0;
-    virtual double getCtcssFrequency() const = 0;
+    virtual double getCtcssFrequency() const;
 
     memory toMemory() const;
 

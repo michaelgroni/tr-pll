@@ -12,7 +12,6 @@ public:
     void setRxFrequency(uint32_t frequency);
     uint32_t getTxFrequency() const;
     bool isCtcssOn() const;
-    double getCtcssFrequency() const;
     void up(int n);
 
 private:

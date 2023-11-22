@@ -93,3 +93,9 @@ memory TrxState::toMemory() const
     m.ctcssOn = isCtcssOn();
     return m;
 }
+
+
+double TrxState::getCtcssFrequency() const
+{
+    return ctcssValues.at(ctcssIndex);
+}

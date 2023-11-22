@@ -8,6 +8,6 @@ public:
     uint32_t getTxFrequency() const;
     bool isTxAllowed() const;
     bool isCtcssOn() const;
-private:
+protected:
     int32_t offset = 0;
 };
