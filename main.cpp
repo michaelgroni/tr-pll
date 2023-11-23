@@ -7,6 +7,7 @@
 
 #include "settings.h"
 #include "TrxStateVfo.h"
+#include "TrxStateScanMin.h"
 #include "Display.h"
 #include "I2Cinput.h"
 #include "GPIOinput.h"
@@ -91,9 +92,14 @@ int main()
 
         auto mode = I2Cinput::getInstance()->getMode();
 
-        switch (I2Cinput::getInstance()->getMemoryChannel())
+        switch (I2Cinput::getInstance()->getSpecialMemoryChannel())
         {
-        default:
+        case 1:
+            currentState = &trxStateScanMin;
+            currentState->up(updown);
+            break;
+        default:        
+            currentState = isPressed("ab") ? &vfoB : &vfoA; // read vfo switch
             TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(currentState);
             if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
             {
@@ -134,9 +140,6 @@ int main()
             else if (!isPressed("ptt"))
             {
                 setTxAllowed(false);
-
-                // read vfo switch
-                currentState = isPressed("ab") ? &vfoB : &vfoA;
                 currentState->up(updown);
             }
             else // PTT pressed

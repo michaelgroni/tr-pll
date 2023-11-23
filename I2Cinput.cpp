@@ -12,7 +12,7 @@ void I2Cinput::update() // must be called in the main loop
     i2c_read_blocking(I2C_PORT, IC4_ADDR, &byte2, 1, false);
 }
 
-uint8_t I2Cinput::getMemoryChannel() // memory switch
+uint8_t I2Cinput::getSpecialMemoryChannel() // memory switch
 {
     if ((byte2 & 4) == 0)
         return 6;

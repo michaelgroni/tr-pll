@@ -5,7 +5,9 @@
 class TrxStateSpecialMemory : public TrxState
 {
 public:
+    uint32_t getRxFrequency() const;
     uint32_t getTxFrequency() const;
+    void up(int n);
     bool isTxAllowed() const;
     bool isCtcssOn() const;
 protected:

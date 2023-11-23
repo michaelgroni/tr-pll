@@ -1,5 +1,6 @@
 #include "TrxStateSpecialMemory.h"
 
+
 uint32_t TrxStateSpecialMemory::getTxFrequency() const
 {
     return getRxFrequency();

@@ -11,7 +11,7 @@ class I2Cinput
 public:
     static I2Cinput* getInstance();
     void update(); // must be called in the main loop
-    uint8_t getMemoryChannel();
+    uint8_t getSpecialMemoryChannel();
     mode getMode();
     int32_t getDuplexOffset();
 

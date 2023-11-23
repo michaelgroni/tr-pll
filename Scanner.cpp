@@ -5,6 +5,7 @@
 #include "GPIOinput.h"
 #include "GPIOoutput.h"
 #include "memory.h"
+#include "TrxStateScanMin.h"
 
 
 void Scanner::update(TrxStateVfo *trxStateVfo)
@@ -39,13 +40,13 @@ void Scanner::update(TrxStateVfo *trxStateVfo)
             trxStateVfo->up(1);
             if (trxStateVfo->getRxFrequency() > scanMax())
             {
-                trxStateVfo->setRxFrequency(scanMin());
+                trxStateVfo->setRxFrequency(trxStateScanMin.getRxFrequency());
             }
         }
         else
         {
             trxStateVfo->up(-1);
-            if (trxStateVfo->getRxFrequency() < scanMin())
+            if (trxStateVfo->getRxFrequency() < trxStateScanMin.getRxFrequency())
             {
                 trxStateVfo->setRxFrequency(scanMax());
             }
