@@ -37,18 +37,24 @@ void Scanner::update(TrxStateVfo *trxStateVfo)
     {
         if (up)
         {
-            trxStateVfo->up(1);
-            if (trxStateVfo->getRxFrequency() > scanMax())
+            if (trxStateVfo->getRxFrequency() >= scanMax())
             {
                 trxStateVfo->setRxFrequency(trxStateScanMin.getRxFrequency());
+            }
+            else
+            {
+                trxStateVfo->up(1);
             }
         }
         else
         {
-            trxStateVfo->up(-1);
-            if (trxStateVfo->getRxFrequency() < trxStateScanMin.getRxFrequency())
+            if (trxStateVfo->getRxFrequency() <= trxStateScanMin.getRxFrequency())
             {
                 trxStateVfo->setRxFrequency(scanMax());
+            }
+            else
+            {
+                trxStateVfo->up(-1);
             }
         }
     }
