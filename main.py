@@ -29,7 +29,7 @@ subtone = Subtone()
 encoder = RotaryEncoder(userInput.rotaryClockPin, userInput.rotaryDataPin)
 
 
-# interrupt handler encoeder button
+# interrupt handler encoder button
 
 lastEncPress = 0 # timestamp for debouncing
 
