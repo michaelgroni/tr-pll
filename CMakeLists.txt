@@ -78,9 +78,6 @@ target_link_libraries(MCP4725 settings pico_stdlib hardware_i2c hardware_spi har
 add_library(ADF4351 ADF4351.cpp)
 target_link_libraries(ADF4351 settings pico_stdlib hardware_spi hardware_pio)
 
-add_library(Scanner Scanner.cpp)
-target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput memory hardware_timer)
-
 add_library(Display Display.cpp)
 target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo Scanner)
 
@@ -88,13 +85,16 @@ add_library(TrxStateSpecialMemory TrxStateSpecialMemory.cpp)
 target_link_libraries(TrxStateSpecialMemory TrxState)
 
 add_library(TrxStateScanMin TrxStateScanMin.cpp)
-target_link_libraries(TrxStateScanMin TrxStateSpecialMemory)
+target_link_libraries(TrxStateScanMin pico_stdlib TrxStateSpecialMemory settings)
+
+add_library(Scanner Scanner.cpp)
+target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput TrxStateScanMin memory hardware_timer)
 
 # Add any user requested libraries
 target_link_libraries(tr-pll
         pico_stdlib
         hardware_i2c
-        hardware_spi
+        hardware_spi 
         hardware_pio
         TrxState
         TrxStateVfo
@@ -106,6 +106,7 @@ target_link_libraries(tr-pll
         MCP4725
         ADF4351
         Scanner
+        TrxStateScanMin
         )
 
 pico_add_extra_outputs(tr-pll)
