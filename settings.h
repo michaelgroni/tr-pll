@@ -69,6 +69,7 @@ inline const std::unordered_map<std::string, uint> gpioInPins =
     {"ptt", 20},
     {"stepDecrease", 17}, // formerly scan button
     {"stepIncrease", 16}, // formerly hold button
+    {"m", 19}, // memory save button
     {"mr", 8}, // memory read switch
     {"ms", 9}, // memory scan swith
     {"ab", 11}, // pressed = VFO B - not pressed = VFO A

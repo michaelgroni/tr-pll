@@ -1,6 +1,8 @@
 #include "Display.h"
 
 #include "TrxStateVfo.h"
+#include "TrxStateSpecialMemory.h"
+#include "TrxStateScanMin.h"
 
 #include "pico-ssd1306/textRenderer/TextRenderer.h"
 #include "pico-ssd1306/shapeRenderer/ShapeRenderer.h"
@@ -26,7 +28,7 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
         changed = true;
     }
 
-    // duplex shift
+    // info northeast (one char)
     const auto txf = trxState.getTxFrequency();
     const auto rxf = trxState.getRxFrequency();
     char infoNortheast;
@@ -39,9 +41,17 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     {
         infoNortheast = '+';
     }
-    else
+    else // no duplex shift
     {
-        infoNortheast = ' ';
+        const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
+        if ((tss != nullptr) && tss->isNotSaved())
+        {
+            infoNortheast = '*';
+        }
+        else
+        {
+            infoNortheast = ' ';
+        }
     }
 
     if (infoNortheast != this->infoNortheast)
@@ -50,20 +60,27 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
         changed = true;
     }
 
-
     // line2
     std::string newLine2;
-    
+
     if (!trxState.isCtcssOn()) // no CTCSS; step in line 2
     {
-        const TrxStateVfo* tsv = dynamic_cast<TrxStateVfo*>(&trxState);
-        if (tsv == nullptr) // no vfo
+        const TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(&trxState);
+        if (tsv != nullptr)
         {
-            newLine2 = "";
+            newLine2 = "Step " + tsv->getStepToString();
         }
         else
         {
-            newLine2 = "Step " + tsv->getStepToString();
+            const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
+            if (tss != nullptr)
+            {
+                newLine2 = "Step " + tss->getStepToString();
+            }
+            else
+            {
+                newLine2 = "";
+            }
         }
     }
     else // CTCSS
@@ -79,19 +96,27 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
         changed = true;
     }
 
-
     // line 3
-    if (scanner.isOn() && (line3.compare("scan") != 0))
+    std::string newLine3;
+    const TrxStateScanMin *tsm = dynamic_cast<TrxStateScanMin *>(&trxState);
+    if (tsm != nullptr)
     {
-        setLine3("scan");
+        newLine3 = "scan min";
+    }
+    else if (scanner.isOn())
+    {
+        newLine3 = "scan";
+    }
+    else if (!scanner.isOn())
+    {
+        newLine3 = "";
+    }
+
+    if (line3.compare(newLine3) != 0)
+    {
+        setLine3(newLine3);
         changed = true;
     }
-    if (!scanner.isOn() && (line3.compare("") != 0))
-    {
-        setLine3("");
-        changed = true;
-    }    
-
 
     if (changed)
     {

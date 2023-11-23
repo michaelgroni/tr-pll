@@ -9,6 +9,11 @@ uint32_t TrxStateScanMin::getRxFrequency() const
 
 void TrxStateScanMin::up(int n)
 {
+    while ( getRxFrequency() % getStep() != 0) // step could have been changed
+    {
+        offset--;
+    }
+
     offset += n*getStep();
 
     if (getRxFrequency() > F_MAX)
@@ -19,4 +24,10 @@ void TrxStateScanMin::up(int n)
     {
         offset = F_MIN - scanMin();
     }
+}
+
+void TrxStateScanMin::save()
+{
+    saveScanMin(getRxFrequency());
+    offset = 0;
 }

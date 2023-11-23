@@ -94,9 +94,14 @@ int main()
 
         switch (I2Cinput::getInstance()->getSpecialMemoryChannel())
         {
-        case 1:
+        case 1: // scan min
             currentState = &trxStateScanMin;
             currentState->up(updown);
+            if (wasPressed("m") && isPressed("m"))
+            {
+                Piezo::getInstance()->beepOK();
+                trxStateScanMin.save();
+            }
             break;
         default:        
             currentState = isPressed("ab") ? &vfoB : &vfoA; // read vfo switch

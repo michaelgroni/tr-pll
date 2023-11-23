@@ -15,3 +15,8 @@ bool TrxStateSpecialMemory::isCtcssOn() const
 {
     return false;
 }
+
+bool TrxStateSpecialMemory::isNotSaved() const
+{
+    return offset != 0;
+}

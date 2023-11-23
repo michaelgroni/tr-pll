@@ -4,11 +4,13 @@
 #include "hardware/flash.h"
 #include "hardware/sync.h"
 
+#include <cstring> // memcpy
+
 uint8_t UNIQUE_ID;
 
 memory* flashData = (memory*) (XIP_BASE + MY_FLASH_DATA); // 256 * 16 bytes = 1 sector = 16 pages
 /*
-    flashContent[0] contains fScanMin (rxFrequency) and fScanMax (txFrequeny)
+    flashData[0] contains fScanMin (rxFrequency) and fScanMax (txFrequeny)
 */
 
 void flashInit()
@@ -45,4 +47,17 @@ uint32_t scanMin()
 uint32_t scanMax()
 {
     return flashData[0].txFrequency;
+}
+
+void saveScanMin(uint32_t frequency)
+{
+    struct memory tempData[256];
+    memcpy(tempData, flashData, 4096);
+    
+    tempData[0].rxFrequency = frequency;
+
+    auto interruptState = save_and_disable_interrupts();
+    flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes
+    flash_range_program(MY_FLASH_DATA, (uint8_t*) tempData, 4096);
+    restore_interrupts (interruptState);
 }
