@@ -10,7 +10,9 @@ uint8_t UNIQUE_ID;
 
 memory* flashData = (memory*) (XIP_BASE + MY_FLASH_DATA); // 256 * 16 bytes = 1 sector = 16 pages
 /*
-    flashData[0] contains fScanMin (rxFrequency) and fScanMax (txFrequeny)
+    flashData[0] contains fScanMin (rxFrequency) and fScanMax (txFrequeny).
+
+    flashData[1] ... flashData[MEMORIES] are the memory channels.
 */
 
 void flashInit()
@@ -21,9 +23,12 @@ void flashInit()
 
     if (UNIQUE_ID != *firstFlashByte) // no data in the flash memory
     {
-        memory scannerConfig;
-        scannerConfig.rxFrequency = F_MIN; // fScanMin
-        scannerConfig.txFrequency = F_MAX; // fScanMax
+        struct memory tempData[256];
+
+        tempData[0].rxFrequency = F_MIN; // fScanMin
+        tempData[0].txFrequency = F_MAX; // fScanMax
+
+        
 
         auto interruptState = save_and_disable_interrupts();
         
@@ -33,7 +38,7 @@ void flashInit()
 
         // write flash data
         flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes
-        flash_range_program(MY_FLASH_DATA, (uint8_t*) &scannerConfig, FLASH_PAGE_SIZE);
+        flash_range_program(MY_FLASH_DATA, (uint8_t*) tempData, 4096);
         
         restore_interrupts (interruptState);
     }
@@ -55,6 +60,19 @@ void saveScanMin(uint32_t frequency)
     memcpy(tempData, flashData, 4096);
     
     tempData[0].rxFrequency = frequency;
+
+    auto interruptState = save_and_disable_interrupts();
+    flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes
+    flash_range_program(MY_FLASH_DATA, (uint8_t*) tempData, 4096);
+    restore_interrupts (interruptState);
+}
+
+void saveScanMax(uint32_t frequency)
+{
+    struct memory tempData[256];
+    memcpy(tempData, flashData, 4096);
+    
+    tempData[0].txFrequency = frequency;
 
     auto interruptState = save_and_disable_interrupts();
     flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes

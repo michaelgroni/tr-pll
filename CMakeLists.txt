@@ -84,11 +84,14 @@ target_link_libraries(TrxStateSpecialMemory TrxState)
 add_library(TrxStateScanMin TrxStateScanMin.cpp)
 target_link_libraries(TrxStateScanMin pico_stdlib TrxStateSpecialMemory settings)
 
+add_library(TrxStateScanMax TrxStateScanMax.cpp)
+target_link_libraries(TrxStateScanMax pico_stdlib TrxStateSpecialMemory settings)
+
 add_library(Display Display.cpp)
-target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo TrxStateSpecialMemory TrxStateScanMin Scanner)
+target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo TrxStateSpecialMemory TrxStateScanMin TrxStateScanMax Scanner)
 
 add_library(Scanner Scanner.cpp)
-target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput TrxStateScanMin memory hardware_timer)
+target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput TrxStateScanMin TrxStateScanMax memory hardware_timer)
 
 # Add any user requested libraries
 target_link_libraries(tr-pll

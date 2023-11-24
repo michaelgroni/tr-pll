@@ -8,6 +8,7 @@
 #include "settings.h"
 #include "TrxStateVfo.h"
 #include "TrxStateScanMin.h"
+#include "TrxStateScanMax.h"
 #include "Display.h"
 #include "I2Cinput.h"
 #include "GPIOinput.h"
@@ -94,7 +95,7 @@ int main()
 
         switch (I2Cinput::getInstance()->getSpecialMemoryChannel())
         {
-        case 1: // scan min
+        case 1: // special memory scan min
             currentState = &trxStateScanMin;
             currentState->up(updown);
             if (wasPressed("m") && isPressed("m"))
@@ -103,6 +104,15 @@ int main()
                 trxStateScanMin.save();
             }
             break;
+        case 2: // special memory scan max
+            currentState = &trxStateScanMax;
+            currentState->up(updown);
+            if (wasPressed("m") && isPressed("m"))
+            {
+                Piezo::getInstance()->beepOK();
+                trxStateScanMax.save();
+            }
+            break; 
         default:        
             currentState = isPressed("ab") ? &vfoB : &vfoA; // read vfo switch
             TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(currentState);

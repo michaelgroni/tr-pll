@@ -17,3 +17,4 @@ void flashInit();
 uint32_t scanMin();
 uint32_t scanMax();
 void saveScanMin(uint32_t frequency);
+void saveScanMax(uint32_t frequency);

@@ -3,6 +3,7 @@
 #include "TrxStateVfo.h"
 #include "TrxStateSpecialMemory.h"
 #include "TrxStateScanMin.h"
+#include "TrxStateScanMax.h"
 
 #include "pico-ssd1306/textRenderer/TextRenderer.h"
 #include "pico-ssd1306/shapeRenderer/ShapeRenderer.h"
@@ -98,11 +99,16 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
 
     // line 3
     std::string newLine3;
-    const TrxStateScanMin *tsm = dynamic_cast<TrxStateScanMin *>(&trxState);
-    if (tsm != nullptr)
+    const TrxStateScanMin *tsmin = dynamic_cast<TrxStateScanMin *>(&trxState);
+    const TrxStateScanMax *tsmax = dynamic_cast<TrxStateScanMax *>(&trxState);
+    if (tsmin != nullptr)
     {
         newLine3 = "scan min";
     }
+    else if (tsmax != nullptr)
+    {
+        newLine3 = "scan max";
+    }    
     else if (scanner.isOn())
     {
         newLine3 = "scan";
