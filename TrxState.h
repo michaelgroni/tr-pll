@@ -13,8 +13,8 @@ public:
     virtual uint32_t getRxFrequency() const = 0;
     virtual uint32_t getTxFrequency() const = 0;
     virtual void up(int n) = 0;
-    void stepUp();
-    void stepDown();
+    virtual void stepUp();
+    virtual void stepDown();
     unsigned int getStep() const;
     std::string getStepToString() const;
 

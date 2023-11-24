@@ -12,6 +12,7 @@
 // memory
 inline const uint32_t MY_FLASH_OFFSET = 510 * FLASH_SECTOR_SIZE;
 inline const uint32_t MY_FLASH_DATA = MY_FLASH_OFFSET + FLASH_SECTOR_SIZE;
+inline const size_t MEMORIES = 100;
 
 
 // frequencies

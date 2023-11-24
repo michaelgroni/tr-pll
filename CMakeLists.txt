@@ -87,6 +87,9 @@ target_link_libraries(TrxStateScanMin pico_stdlib TrxStateSpecialMemory settings
 add_library(TrxStateScanMax TrxStateScanMax.cpp)
 target_link_libraries(TrxStateScanMax pico_stdlib TrxStateSpecialMemory settings)
 
+add_library(TrxStateMemories TrxStateMemories.cpp)
+target_link_libraries(TrxStateMemories pico_stdlib TrxState memory)
+
 add_library(Display Display.cpp)
 target_link_libraries(Display pico_stdlib pico_ssd1306 hardware_i2c hardware_spi hardware_pio TrxStateVfo TrxStateSpecialMemory TrxStateScanMin TrxStateScanMax Scanner)
 

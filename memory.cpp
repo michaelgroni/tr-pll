@@ -21,14 +21,17 @@ void flashInit()
     flash_get_unique_id(&UNIQUE_ID);
     uint8_t* firstFlashByte = (uint8_t*) (XIP_BASE + MY_FLASH_OFFSET);
 
-    if (UNIQUE_ID != *firstFlashByte) // no data in the flash memory
+    if (UNIQUE_ID != *firstFlashByte) // no data in the flash memory, write for the first time
     {
         struct memory tempData[256];
 
         tempData[0].rxFrequency = F_MIN; // fScanMin
         tempData[0].txFrequency = F_MAX; // fScanMax
 
-        
+        for (size_t i = 1; i<=MEMORIES; i++)
+        {
+            tempData[i].isUsed = false;
+        }
 
         auto interruptState = save_and_disable_interrupts();
         
