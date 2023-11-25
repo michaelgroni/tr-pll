@@ -90,7 +90,8 @@ memory TrxState::toMemory() const
     m.rxFrequency = getRxFrequency();
     m.txFrequency = getTxFrequency();
     m.ctcssIndex = ctcssIndex;
-    m.ctcssOn = isCtcssOn();
+    m.isCtcssOn = isCtcssOn();
+    m.isUsed = true;
     return m;
 }
 

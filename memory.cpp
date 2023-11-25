@@ -8,12 +8,6 @@
 
 uint8_t UNIQUE_ID;
 
-memory* flashData = (memory*) (XIP_BASE + MY_FLASH_DATA); // 256 * 16 bytes = 1 sector = 16 pages
-/*
-    flashData[0] contains fScanMin (rxFrequency) and fScanMax (txFrequeny).
-
-    flashData[1] ... flashData[MEMORIES] are the memory channels.
-*/
 
 void flashInit()
 {
