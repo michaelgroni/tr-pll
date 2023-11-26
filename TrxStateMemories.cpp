@@ -77,6 +77,11 @@ void TrxStateMemories::up(int n)
     } while ((n != 0) && (memoryIndex != oldMemoryIndex));
 }
 
+size_t TrxStateMemories::getMemoryIndex() const
+{
+    return memoryIndex;
+}
+
 void TrxStateMemories::stepUp()
 {
     Piezo::getInstance()->beepError();
@@ -95,4 +100,14 @@ bool TrxStateMemories::isCtcssOn() const
 double TrxStateMemories::getCtcssFrequency() const
 {
     return ctcssValues.at(flashData[XIP_BASE+memoryIndex].ctcssIndex);
+}
+
+bool TrxStateMemories::isWriteModeOn() const
+{
+    return writeModeOn;
+}
+
+void TrxStateMemories::setWriteModeOn(bool writeModeOn)
+{
+    this->writeModeOn = writeModeOn;
 }

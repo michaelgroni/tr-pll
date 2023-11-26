@@ -7,6 +7,7 @@
 #include "hardware/spi.h"
 #include "hardware/pio.h"
 #include "hardware/flash.h"
+#include <cstddef>
 
 
 // memory
@@ -27,7 +28,7 @@ inline const uint32_t VFO_B_INIT = 144375000;
 // waiting times in milliseconds
 // inline const uint32_t DEBOUNCE_TIME = 200;
 inline const uint32_t SCANNER_WAIT_QSO_TIME = 4000;
-inline const uint32_t SCANNER_WAIT_PLL_TIME = 20;
+inline const uint32_t SCANNER_WAIT_PLL_TIME = 21;
 inline const uint32_t SCANNER_WAIT_SQUELCH_TIME = 65;
 
 

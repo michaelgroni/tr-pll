@@ -2,6 +2,8 @@
 
 #include "pico/stdlib.h"
 
+#include "settings.h"
+
 struct memory               // 16 bytes
 {
     uint32_t rxFrequency;   // 4 bytes
@@ -19,7 +21,7 @@ uint32_t scanMax();
 void saveScanMin(uint32_t frequency);
 void saveScanMax(uint32_t frequency);
 
-memory* flashData = (memory*) (XIP_BASE + MY_FLASH_DATA); // 256 * 16 bytes = 1 sector = 16 pages
+inline memory* flashData = (memory*) (XIP_BASE + MY_FLASH_DATA); // 256 * 16 bytes = 1 sector = 16 pages
 /*
     flashData[0] contains fScanMin (rxFrequency) and fScanMax (txFrequeny).
 

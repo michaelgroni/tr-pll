@@ -9,6 +9,7 @@
 #include "TrxStateVfo.h"
 #include "TrxStateScanMin.h"
 #include "TrxStateScanMax.h"
+#include "TrxStateMemories.h"
 #include "Display.h"
 #include "I2Cinput.h"
 #include "GPIOinput.h"
@@ -57,6 +58,7 @@ int main()
 
     TrxStateVfo vfoA(VFO_A_INIT);
     TrxStateVfo vfoB(VFO_B_INIT);
+    TrxStateMemories memories;
 
     Scanner scanner;
 
@@ -112,9 +114,21 @@ int main()
                 Piezo::getInstance()->beepOK();
                 trxStateScanMax.save();
             }
-            break; 
-        default:        
-            currentState = isPressed("ab") ? &vfoB : &vfoA; // read vfo switch
+            break;
+        default: // no special memory channel active
+            if (isPressed("mr")) // memory read switch
+            {
+                currentState = &memories;
+
+                if (wasPressed("m") && isPressed("m"))
+                {
+                    memories.setWriteModeOn(!memories.isWriteModeOn());
+                }
+            }
+            else  // read vfo switch
+            {
+                currentState = isPressed("ab") ? &vfoB : &vfoA;
+            }
             TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(currentState);
             if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
             {
@@ -162,17 +176,17 @@ int main()
             {
                 // TODO
             }
-        }
 
-        // update peripherals
-        Display::getInstance()->update(*currentState, scanner);
-        ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
-        if (!scanner.isOn())
-        {
-            writeDAC(dacValue(dacVoltage(currentState->getTxFrequency()))); // tune drive unit
-            Ctcss::getInstance()->update(*currentState);
-        }
+            // update peripherals
+            Display::getInstance()->update(*currentState, scanner);
+            ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
+            if (!scanner.isOn())
+            {
+                writeDAC(dacValue(dacVoltage(currentState->getTxFrequency()))); // tune drive unit
+                Ctcss::getInstance()->update(*currentState);
+            }
 
-        setTxAllowed(currentState->isTxAllowed() && !scanner.isOn());
+            setTxAllowed(currentState->isTxAllowed() && !scanner.isOn());
+        }
     }
 }

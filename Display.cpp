@@ -4,6 +4,7 @@
 #include "TrxStateSpecialMemory.h"
 #include "TrxStateScanMin.h"
 #include "TrxStateScanMax.h"
+#include "TrxStateMemories.h"
 
 #include "pico-ssd1306/textRenderer/TextRenderer.h"
 #include "pico-ssd1306/shapeRenderer/ShapeRenderer.h"
@@ -67,21 +68,14 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     if (!trxState.isCtcssOn()) // no CTCSS; step in line 2
     {
         const TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(&trxState);
-        if (tsv != nullptr)
+        const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
+        if (tsv != nullptr || tss != nullptr)
         {
-            newLine2 = "Step " + tsv->getStepToString();
+            newLine2 = "Step " + trxState.getStepToString();
         }
         else
         {
-            const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
-            if (tss != nullptr)
-            {
-                newLine2 = "Step " + tss->getStepToString();
-            }
-            else
-            {
-                newLine2 = "";
-            }
+            newLine2 = "";
         }
     }
     else // CTCSS
@@ -101,6 +95,7 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     std::string newLine3;
     const TrxStateScanMin *tsmin = dynamic_cast<TrxStateScanMin *>(&trxState);
     const TrxStateScanMax *tsmax = dynamic_cast<TrxStateScanMax *>(&trxState);
+    const TrxStateMemories *tsmem = dynamic_cast<TrxStateMemories *>(&trxState);
     if (tsmin != nullptr)
     {
         newLine3 = "scan min";
@@ -108,12 +103,20 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     else if (tsmax != nullptr)
     {
         newLine3 = "scan max";
-    }    
+    }
+    else if (!scanner.isOn() && tsmem != nullptr)
+    {
+        newLine3 = "Memory " + tsmem->getMemoryIndex();
+    }
+    else if (scanner.isOn() && tsmem != nullptr)
+    {
+        newLine3 = "Memory scan " + tsmem->getMemoryIndex();
+    }
     else if (scanner.isOn())
     {
         newLine3 = "scan";
     }
-    else if (!scanner.isOn())
+    else
     {
         newLine3 = "";
     }
