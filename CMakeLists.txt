@@ -56,18 +56,18 @@ add_library(I2Cinput I2Cinput.cpp)
 target_link_libraries(I2Cinput settings pico_stdlib hardware_i2c hardware_spi hardware_pio hardware_timer)
 
 add_library(TrxState TrxState.cpp)
-target_link_libraries(TrxState pico_stdlib hardware_i2c settings hardware_spi hardware_pio I2Cinput memory)
+target_link_libraries(TrxState pico_stdlib hardware_i2c settings hardware_spi hardware_pio I2Cinput)
 
 add_library(TrxStateVfo TrxStateVfo.cpp)
-target_link_libraries(TrxStateVfo TrxState pico_stdlib hardware_i2c hardware_spi hardware_pio)
-
-add_library(memory memory.cpp)
-target_link_libraries(memory settings pico_stdlib hardware_flash hardware_sync)
+target_link_libraries(TrxStateVfo TrxState memory pico_stdlib hardware_i2c hardware_spi hardware_pio)
 
 add_library(GPIOoutput GPIOoutput.cpp)
 target_link_libraries(GPIOoutput settings TrxState pico_stdlib hardware_timer hardware_pio hardware_clocks)
 pico_generate_pio_header(GPIOoutput ${CMAKE_CURRENT_LIST_DIR}/beep.pio)
 pico_generate_pio_header(tr-pll ${CMAKE_CURRENT_LIST_DIR}/ctcss.pio)
+
+add_library(memory memory.cpp)
+target_link_libraries(memory settings TrxState GPIOoutput pico_stdlib hardware_flash hardware_sync)
 
 add_library(GPIOinput GPIOinput.cpp)
 target_link_libraries(GPIOinput settings pico_stdlib hardware_spi hardware_pio GPIOoutput)
@@ -82,10 +82,10 @@ add_library(TrxStateSpecialMemory TrxStateSpecialMemory.cpp)
 target_link_libraries(TrxStateSpecialMemory TrxState)
 
 add_library(TrxStateScanMin TrxStateScanMin.cpp)
-target_link_libraries(TrxStateScanMin pico_stdlib TrxStateSpecialMemory settings)
+target_link_libraries(TrxStateScanMin memory pico_stdlib TrxStateSpecialMemory settings)
 
 add_library(TrxStateScanMax TrxStateScanMax.cpp)
-target_link_libraries(TrxStateScanMax pico_stdlib TrxStateSpecialMemory settings)
+target_link_libraries(TrxStateScanMax memory pico_stdlib TrxStateSpecialMemory settings)
 
 add_library(TrxStateMemories TrxStateMemories.cpp)
 target_link_libraries(TrxStateMemories pico_stdlib TrxState memory settings GPIOoutput)
@@ -127,6 +127,7 @@ target_link_libraries(tr-pll
         TrxStateScanMin
         TrxStateScanMax
         TrxStateMemories
+        memory
         )
 
 pico_add_extra_outputs(tr-pll)

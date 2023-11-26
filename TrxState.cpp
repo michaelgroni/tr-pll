@@ -84,18 +84,6 @@ bool TrxState::isTxAllowed() const
 }
 
 
-memory TrxState::toMemory() const
-{
-    struct memory m;
-    m.rxFrequency = getRxFrequency();
-    m.txFrequency = getTxFrequency();
-    m.ctcssIndex = ctcssIndex;
-    m.isCtcssOn = isCtcssOn();
-    m.isUsed = true;
-    return m;
-}
-
-
 double TrxState::getCtcssFrequency() const
 {
     return ctcssValues.at(ctcssIndex);

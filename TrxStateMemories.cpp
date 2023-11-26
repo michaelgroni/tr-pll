@@ -19,9 +19,9 @@ TrxStateMemories::TrxStateMemories()
 
 uint32_t TrxStateMemories::getRxFrequency() const
 {
-    if  (flashData[XIP_BASE+memoryIndex].isUsed)
+    if  (flashData[memoryIndex].isUsed)
     {
-        return flashData[XIP_BASE+memoryIndex].rxFrequency;
+        return flashData[memoryIndex].rxFrequency;
     }
     else
     {
@@ -31,9 +31,9 @@ uint32_t TrxStateMemories::getRxFrequency() const
 
 uint32_t TrxStateMemories::getTxFrequency() const
 {
-    if  (flashData[XIP_BASE+memoryIndex].isUsed)
+    if  (flashData[memoryIndex].isUsed)
     {
-        return flashData[XIP_BASE+memoryIndex].txFrequency;
+        return flashData[memoryIndex].txFrequency;
     }
     else
     {
@@ -70,7 +70,7 @@ void TrxStateMemories::up(int n)
             memoryIndex += step;
         }
 
-        if (flashData[XIP_BASE+memoryIndex].isUsed)
+        if (flashData[XIP_BASE+memoryIndex].isUsed || isWriteModeOn())
         {
             n -= step;
         }

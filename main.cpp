@@ -115,17 +115,30 @@ int main()
                 trxStateScanMax.save();
             }
             break;
-        default: // no special memory channel active
+        default:                 // no special memory channel active
             if (isPressed("mr")) // memory read switch
             {
                 currentState = &memories;
 
-                if (wasPressed("m") && isPressed("m"))
+                if (!memories.isWriteModeOn()) // write mode is off
                 {
-                    memories.setWriteModeOn(!memories.isWriteModeOn());
+                    if (wasPressed("m") && isPressed("m"))
+                    {
+                        Piezo::getInstance()->beepOK();
+                        memories.setWriteModeOn(true);
+                    }
+                }
+                else // write mode is on
+                {
+                    if (wasPressed("m") && isPressed("m"))
+                    {
+                        TrxStateVfo *lastVfo = isPressed("ab") ? &vfoB : &vfoA;
+                        saveMemory(memories.getMemoryIndex(), lastVfo->toMemory());
+                        memories.setWriteModeOn(false);
+                    }
                 }
             }
-            else  // read vfo switch
+            else // read vfo switch
             {
                 currentState = isPressed("ab") ? &vfoB : &vfoA;
             }

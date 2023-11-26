@@ -1,6 +1,7 @@
 #include "TrxStateScanMax.h"
 
 #include "settings.h"
+#include "memory.h"
 
 uint32_t TrxStateScanMax::getRxFrequency() const
 {

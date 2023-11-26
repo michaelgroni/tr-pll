@@ -72,6 +72,19 @@ void TrxStateVfo::up(int n)
     }
 }
 
+
+memory TrxStateVfo::toMemory() const
+{
+    struct memory m;
+    m.rxFrequency = this->getRxFrequency();
+    m.txFrequency = this->getTxFrequency();
+    m.ctcssIndex = ctcssIndex;
+    m.isCtcssOn = this->isCtcssOn();
+    m.isUsed = true;
+    return m;
+}
+
+
 void TrxStateVfo::ctcssUp(int n)
 {
     if (n>=0)

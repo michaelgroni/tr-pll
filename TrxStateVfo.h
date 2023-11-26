@@ -3,6 +3,7 @@
 #include "pico/stdlib.h"
 
 #include "TrxState.h"
+#include "memory.h"
 
 class TrxStateVfo : public TrxState
 {
@@ -13,6 +14,7 @@ public:
     uint32_t getTxFrequency() const;
     bool isCtcssOn() const;
     void up(int n);
+    memory toMemory() const;
 
 private:
     uint32_t rxFrequency;

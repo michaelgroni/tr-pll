@@ -1,6 +1,7 @@
 #include "TrxStateScanMin.h"
 
 #include "settings.h"
+#include "memory.h"
 
 uint32_t TrxStateScanMin::getRxFrequency() const
 {

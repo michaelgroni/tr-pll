@@ -22,6 +22,12 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
 {
     bool changed = false;
 
+    const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
+    const TrxStateScanMin *tsmin = dynamic_cast<TrxStateScanMin *>(&trxState);
+    const TrxStateScanMax *tsmax = dynamic_cast<TrxStateScanMax *>(&trxState);
+    const TrxStateMemories *tsmem = dynamic_cast<TrxStateMemories *>(&trxState);
+    const TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(&trxState);
+
     // frequency
     auto newFrequency = trxState.getCurrentFrequency();
     if (newFrequency != frequency)
@@ -45,7 +51,6 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     }
     else // no duplex shift
     {
-        const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
         if ((tss != nullptr) && tss->isNotSaved())
         {
             infoNortheast = '*';
@@ -64,11 +69,12 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
 
     // line2
     std::string newLine2;
-
-    if (!trxState.isCtcssOn()) // no CTCSS; step in line 2
+    if (tsmem != nullptr && tsmem->isWriteModeOn())
     {
-        const TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(&trxState);
-        const TrxStateSpecialMemory *tss = dynamic_cast<TrxStateSpecialMemory *>(&trxState);
+        newLine2 = "save M / del REV";
+    }
+    else if (!trxState.isCtcssOn()) // no CTCSS; step in line 2
+    {
         if (tsv != nullptr || tss != nullptr)
         {
             newLine2 = "Step " + trxState.getStepToString();
@@ -92,10 +98,7 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     }
 
     // line 3
-    std::string newLine3;
-    const TrxStateScanMin *tsmin = dynamic_cast<TrxStateScanMin *>(&trxState);
-    const TrxStateScanMax *tsmax = dynamic_cast<TrxStateScanMax *>(&trxState);
-    const TrxStateMemories *tsmem = dynamic_cast<TrxStateMemories *>(&trxState);
+    std::string newLine3 = "";
     if (tsmin != nullptr)
     {
         newLine3 = "scan min";
@@ -104,21 +107,23 @@ void Display::update(TrxState &trxState, const Scanner &scanner)
     {
         newLine3 = "scan max";
     }
-    else if (!scanner.isOn() && tsmem != nullptr)
+    else if (tsmem != nullptr) // memory mode
     {
-        newLine3 = "Memory " + tsmem->getMemoryIndex();
-    }
-    else if (scanner.isOn() && tsmem != nullptr)
-    {
-        newLine3 = "Memory scan " + tsmem->getMemoryIndex();
+        std::stringstream s;
+        s << tsmem->getMemoryIndex();
+
+        if (scanner.isOn())
+        {
+            newLine3 = "Mem scan " + s.str();
+        }
+        else
+        {
+            newLine3 = "Mem " + s.str();
+        }
     }
     else if (scanner.isOn())
     {
         newLine3 = "scan";
-    }
-    else
-    {
-        newLine3 = "";
     }
 
     if (line3.compare(newLine3) != 0)
