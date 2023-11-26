@@ -106,7 +106,7 @@ target_link_libraries(Display
         )
 
 add_library(Scanner Scanner.cpp)
-target_link_libraries(Scanner pico_stdlib TrxState GPIOinput GPIOoutput TrxStateScanMin TrxStateScanMax memory hardware_timer)
+target_link_libraries(Scanner pico_stdlib TrxStateVfo GPIOinput GPIOoutput TrxStateScanMin TrxStateScanMax memory hardware_timer)
 
 # Add any user requested libraries
 target_link_libraries(tr-pll

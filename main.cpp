@@ -176,7 +176,7 @@ int main()
                         scanner.setUp(updown > 0);
                     }
 
-                    scanner.update(tsv);
+                    scanner.update(*currentState);
                 }
             }
             else if (!isPressed("ptt"))

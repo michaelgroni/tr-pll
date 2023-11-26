@@ -70,7 +70,7 @@ void TrxStateMemories::up(int n)
             memoryIndex += step;
         }
 
-        if (flashData[XIP_BASE+memoryIndex].isUsed || isWriteModeOn())
+        if (flashData[memoryIndex].isUsed || isWriteModeOn())
         {
             n -= step;
         }
@@ -94,12 +94,12 @@ void TrxStateMemories::stepDown()
 
 bool TrxStateMemories::isCtcssOn() const
 {
-    return flashData[XIP_BASE+memoryIndex].isCtcssOn;
+    return flashData[memoryIndex].isCtcssOn;
 }
 
 double TrxStateMemories::getCtcssFrequency() const
 {
-    return ctcssValues.at(flashData[XIP_BASE+memoryIndex].ctcssIndex);
+    return ctcssValues.at(flashData[memoryIndex].ctcssIndex);
 }
 
 bool TrxStateMemories::isWriteModeOn() const
