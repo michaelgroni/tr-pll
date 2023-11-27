@@ -26,9 +26,10 @@ inline const uint32_t VFO_B_INIT = 144375000;
 
 // waiting times in milliseconds
 // inline const uint32_t DEBOUNCE_TIME = 200;
+inline const uint32_t MAIN_LOOP_PAUSE_TIME = 20;
 inline const uint32_t SCANNER_WAIT_QSO_TIME = 4000;
-inline const uint32_t SCANNER_WAIT_PLL_TIME = 21;
-inline const uint32_t SCANNER_WAIT_SQUELCH_TIME = 65;
+inline const uint32_t SCANNER_WAIT_PLL_TIME = 1;
+inline const uint32_t SCANNER_WAIT_SQUELCH_TIME = 100;
 
 
 // I2C bus

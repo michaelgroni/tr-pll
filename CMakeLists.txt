@@ -88,7 +88,7 @@ add_library(TrxStateScanMax TrxStateScanMax.cpp)
 target_link_libraries(TrxStateScanMax memory pico_stdlib TrxStateSpecialMemory settings)
 
 add_library(TrxStateMemories TrxStateMemories.cpp)
-target_link_libraries(TrxStateMemories pico_stdlib TrxState memory settings GPIOoutput)
+target_link_libraries(TrxStateMemories pico_stdlib TrxState memory settings GPIOoutput GPIOinput)
 
 add_library(Display Display.cpp)
 target_link_libraries(Display
@@ -106,7 +106,7 @@ target_link_libraries(Display
         )
 
 add_library(Scanner Scanner.cpp)
-target_link_libraries(Scanner pico_stdlib TrxStateVfo GPIOinput GPIOoutput TrxStateScanMin TrxStateScanMax memory hardware_timer)
+target_link_libraries(Scanner pico_stdlib TrxState TrxStateVfo GPIOinput GPIOoutput TrxStateScanMin TrxStateScanMax memory hardware_timer)
 
 # Add any user requested libraries
 target_link_libraries(tr-pll

@@ -2,6 +2,7 @@
 
 #include "settings.h"
 #include "memory.h"
+#include "GPIOinput.h"
 #include "GPIOoutput.h"
 
 TrxStateMemories::TrxStateMemories()
@@ -21,7 +22,14 @@ uint32_t TrxStateMemories::getRxFrequency() const
 {
     if  (flashData[memoryIndex].isUsed)
     {
-        return flashData[memoryIndex].rxFrequency;
+        if (!isPressed("reverse"))
+        {
+            return flashData[memoryIndex].rxFrequency;
+        }
+        else
+        {
+            return flashData[memoryIndex].txFrequency;
+        }
     }
     else
     {
@@ -33,7 +41,14 @@ uint32_t TrxStateMemories::getTxFrequency() const
 {
     if  (flashData[memoryIndex].isUsed)
     {
-        return flashData[memoryIndex].txFrequency;
+        if (!isPressed("reverse"))
+        {
+            return flashData[memoryIndex].txFrequency;
+        }
+        else
+        {
+            return flashData[memoryIndex].rxFrequency;
+        }
     }
     else
     {

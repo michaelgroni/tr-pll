@@ -5,10 +5,9 @@
 #include "GPIOinput.h"
 #include "GPIOoutput.h"
 #include "memory.h"
-#include "TrxStateScanMin.h"
+#include "TrxStateMemories.h"
 
-
-void Scanner::update(TrxStateVfo *trxStateVfo)
+void Scanner::update(TrxState *trxState)
 {
     sleep_ms(SCANNER_WAIT_PLL_TIME); // wait for the pll
 
@@ -35,27 +34,39 @@ void Scanner::update(TrxStateVfo *trxStateVfo)
 
     if (isOn())
     {
-        if (up)
+        TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(trxState);
+        TrxStateMemories *tsm = dynamic_cast<TrxStateMemories *>(trxState);
+
+        if (tsv != nullptr) // vfo mode
         {
-            if (trxStateVfo->getRxFrequency() >= scanMax())
+
+            if (up)
             {
-                trxStateVfo->setRxFrequency(trxStateScanMin.getRxFrequency());
+                if (trxState->getRxFrequency() >= scanMax())
+                {
+                    tsv->setRxFrequency(scanMin());
+                }
+                else
+                {
+                    trxState->up(1);
+                }
             }
             else
             {
-                trxStateVfo->up(1);
+                if (trxState->getRxFrequency() <= scanMin())
+                {
+                    tsv->setRxFrequency(scanMax());
+                }
+                else
+                {
+                    trxState->up(-1);
+                }
             }
         }
-        else
+        else if (tsm != nullptr) // memory mode
         {
-            if (trxStateVfo->getRxFrequency() <= trxStateScanMin.getRxFrequency())
-            {
-                trxStateVfo->setRxFrequency(scanMax());
-            }
-            else
-            {
-                trxStateVfo->up(-1);
-            }
+            const int direction = up ? 1 : -1;
+            tsm->up(direction);
         }
     }
 }

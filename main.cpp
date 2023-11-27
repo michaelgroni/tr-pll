@@ -72,7 +72,7 @@ int main()
     // main loop
     while (true)
     {
-        // sleep_ms(1);
+        sleep_ms(MAIN_LOOP_PAUSE_TIME);
 
         // read I²C input
         i2cInput->update(); // must be called in the main loop
@@ -142,10 +142,10 @@ int main()
             {
                 currentState = isPressed("ab") ? &vfoB : &vfoA;
             }
-            TrxStateVfo *tsv = dynamic_cast<TrxStateVfo *>(currentState);
+
             if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
             {
-                if (isPressed("ptt") || (tsv == nullptr) || (mode == ctcss))
+                if (isPressed("ptt") || (mode == ctcss))
                 {
                     Piezo::getInstance()->beepError();
                 }
@@ -176,7 +176,7 @@ int main()
                         scanner.setUp(updown > 0);
                     }
 
-                    scanner.update(*currentState);
+                    scanner.update(currentState);
                 }
             }
             else if (!isPressed("ptt"))
@@ -189,17 +189,17 @@ int main()
             {
                 // TODO
             }
-
-            // update peripherals
-            Display::getInstance()->update(*currentState, scanner);
-            ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
-            if (!scanner.isOn())
-            {
-                writeDAC(dacValue(dacVoltage(currentState->getTxFrequency()))); // tune drive unit
-                Ctcss::getInstance()->update(*currentState);
-            }
-
-            setTxAllowed(currentState->isTxAllowed() && !scanner.isOn());
         }
+
+        // update peripherals
+        Display::getInstance()->update(*currentState, scanner);
+        ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
+        if (!scanner.isOn())
+        {
+            writeDAC(dacValue(dacVoltage(currentState->getTxFrequency()))); // tune drive unit
+            Ctcss::getInstance()->update(*currentState);
+        }
+
+        setTxAllowed(currentState->isTxAllowed() && !scanner.isOn());
     }
 }

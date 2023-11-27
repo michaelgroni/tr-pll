@@ -12,7 +12,7 @@ private:
     bool wasOpen = false;
 
 public:
-    void update(TrxStateVfo* trxStateVfo);
+    void update(TrxState* trxState);
     void setUp(bool up);
     void setOn(bool on);
     bool isOn() const;
