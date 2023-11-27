@@ -21,6 +21,7 @@ uint32_t scanMax();
 void saveScanMin(uint32_t frequency);
 void saveScanMax(uint32_t frequency);
 void saveMemory(const size_t memoryIndex, const memory &m);
+void deleteMemory(const size_t memoryIndex);
 
 inline memory* flashData = (memory*) (XIP_BASE + MY_FLASH_DATA); // 256 * 16 bytes = 1 sector = 16 pages
 /*

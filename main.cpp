@@ -136,11 +136,29 @@ int main()
                         saveMemory(memories.getMemoryIndex(), lastVfo->toMemory());
                         memories.setWriteModeOn(false);
                     }
+                    else if (wasPressed("reverse") && isPressed("reverse"))
+                    {
+                        deleteMemory(memories.getMemoryIndex());
+                        memories.setWriteModeOn(false);
+                    }
+                    else if (wasPressed("ptt") && isPressed("ptt") ||
+                            wasPressed("rotaryButton") && isPressed("rotaryButton")) // leave write mode withut saving
+                    {
+                        Piezo::getInstance()->beepError();
+                        memories.setWriteModeOn(false);
+                    }
                 }
             }
-            else // read vfo switch
+            else // mr is not pressed
             {
-                currentState = isPressed("ab") ? &vfoB : &vfoA;
+                memories.setWriteModeOn(false);
+
+                if (wasPressed("m") && isPressed("m"))
+                {
+                    Piezo::getInstance()->beepError();
+                }
+                
+                currentState = isPressed("ab") ? &vfoB : &vfoA; // read vfo switch
             }
 
             if (wasPressed("rotaryButton") && isPressed("rotaryButton")) // scanner
@@ -193,13 +211,19 @@ int main()
 
         // update peripherals
         Display::getInstance()->update(*currentState, scanner);
-        ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
-        if (!scanner.isOn())
+        if (currentState->getCurrentFrequency() != 0) // no unused memory channel
+        {
+            ADF4351::getInstance()->write(currentState->getCurrentFrequency()); // pll
+        }
+        
+        bool txAllowed = currentState->isTxAllowed() && !scanner.isOn();
+
+        if (txAllowed)
         {
             writeDAC(dacValue(dacVoltage(currentState->getTxFrequency()))); // tune drive unit
             Ctcss::getInstance()->update(*currentState);
         }
 
-        setTxAllowed(currentState->isTxAllowed() && !scanner.isOn());
+        setTxAllowed(txAllowed);
     }
 }

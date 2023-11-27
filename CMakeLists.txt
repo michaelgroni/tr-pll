@@ -29,7 +29,7 @@ pico_sdk_init()
 add_executable(tr-pll main.cpp )
 
 pico_set_program_name(tr-pll "tr-pll")
-pico_set_program_version(tr-pll "3.0")
+pico_set_program_version(tr-pll "3.0.0 RC1")
 
 #pico_enable_stdio_uart(tr-pll 0)
 #pico_enable_stdio_usb(tr-pll 0)

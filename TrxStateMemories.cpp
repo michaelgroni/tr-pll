@@ -58,17 +58,9 @@ uint32_t TrxStateMemories::getTxFrequency() const
 
 void TrxStateMemories::up(int n)
 {
-    int step = 0;
-    if (n>0)
-    {
-        step = 1;
-    }
-    else if (n<0)
-    {
-        step = -1;
-    }
+    if (n==0) return;
 
-    auto oldMemoryIndex = memoryIndex;
+    int step = n>0 ? 1 : -1;
 
     do
     {
@@ -89,7 +81,7 @@ void TrxStateMemories::up(int n)
         {
             n -= step;
         }
-    } while ((n != 0) && (memoryIndex != oldMemoryIndex));
+    } while (n != 0);
 }
 
 size_t TrxStateMemories::getMemoryIndex() const
@@ -125,4 +117,9 @@ bool TrxStateMemories::isWriteModeOn() const
 void TrxStateMemories::setWriteModeOn(bool writeModeOn)
 {
     this->writeModeOn = writeModeOn;
+}
+
+bool TrxStateMemories::isTxAllowed() const
+{
+    return (!isWriteModeOn()) && TrxState::isTxAllowed();
 }

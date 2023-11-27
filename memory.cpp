@@ -81,6 +81,7 @@ void saveScanMax(uint32_t frequency)
     restore_interrupts(interruptState);
 }
 
+
 void saveMemory(const size_t memoryIndex, const memory &m)
 {
     if (memoryIndex < 1 || memoryIndex > MEMORIES)
@@ -95,6 +96,29 @@ void saveMemory(const size_t memoryIndex, const memory &m)
         memcpy(tempData, flashData, 4096);
 
         tempData[memoryIndex] = m;
+
+        auto interruptState = save_and_disable_interrupts();
+        flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes
+        flash_range_program(MY_FLASH_DATA, (uint8_t *)tempData, 4096);
+        restore_interrupts(interruptState);
+    }
+}
+
+
+void deleteMemory(const size_t memoryIndex)
+{
+    if (memoryIndex < 1 || memoryIndex > MEMORIES)
+    {
+        Piezo::getInstance()->beepError();
+    }
+    else
+    {
+        Piezo::getInstance()->beepWriteOK();
+
+        struct memory tempData[256];
+        memcpy(tempData, flashData, 4096);
+
+        tempData[memoryIndex].isUsed = false;
 
         auto interruptState = save_and_disable_interrupts();
         flash_range_erase(MY_FLASH_DATA, FLASH_SECTOR_SIZE); // erase 1 sector = 4096 bytes

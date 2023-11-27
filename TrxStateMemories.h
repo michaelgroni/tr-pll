@@ -18,6 +18,7 @@ public:
     double getCtcssFrequency() const;
     void setWriteModeOn(bool writeModeOn);
     bool isWriteModeOn() const;
+    bool isTxAllowed() const;
 private:
     size_t memoryIndex; // 1 .. MEMORIES
     bool writeModeOn = false;
