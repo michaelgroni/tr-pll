@@ -5,7 +5,7 @@
 * CTCSS encoder
 * 100 memory channels without backup battery
 
-## Circuit diagrams with notes in German
+## Circuit diagrams
 ### CONTROL UNIT
 ![CONTROL UNIT](CONTROL.png)
 
