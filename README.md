@@ -1,13 +1,9 @@
-# tr-pll
-## Work in progress
-In this branch, the code is rewritten in C++.
-
 ## Modifications for the transceiver Kenwood TR-9130
 * new control board with a Raspberry Pi Pico
 * OLED display
 * new PLL with TCXO, step size 10 Hz
 * CTCSS encoder
-* memory channels without backup battery
+* 100 memory channels without backup battery
 
 ## Circuit diagrams with notes in German
 ### CONTROL UNIT
@@ -16,7 +12,36 @@ In this branch, the code is rewritten in C++.
 ### PLL UNIT
 ![PLL UNIT](PLL.png)
 
-### OPTIONAL (notes in German)
+## Changes compared to the original user manual
+### Memory channels
+* The memory channels are selected with thr msin dial.
+* Special memory channels, selected with the memory switch:
+* * 1 Scanner start frequency
+  * 2 Scanner stop frequency
+  * 3 to 5 not used (the same as 6 at the moment)
+  * 6 normal operation
+The relay shift and a possibly set sub-tone are also saved. The switches for shift and CTCSS are irrelevant in memory mode (MR switch on).
+### Save and delete memory channels
+Press the M button when in memory mode (MR switched on) and follow the instructions in the display.
+
+### Step size
+Decrease an increase the step size with the former scan and hold buttons.
+
+### Scanner
+Use the rotary encoder button to start and stop the scanner in vfo or memory mode. It can also be stopped with the ptt button.
+
+### No RIT
+The RIT is not supported.
+
+### CTCSS encoder
+Set the mode switch to FM1 to switch on the CTCSS encoder. You can use the main dial to set the sub-tone frequency.
+
+### Unused contols
+* RIT rotary knob and switch
+* DS switch
+* MS pushbutton
+  
+## OPTIONAL (notes in German)
 ![OPTIONAL](circuit2.png)
 
 
