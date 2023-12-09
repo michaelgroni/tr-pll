@@ -40,7 +40,7 @@ Set the mode switch to FM1 to switch on the CTCSS encoder. You can use the main 
 ### Unused contols
 * RIT rotary knob and switch
 * DS switch
-* MS pushbutton
+* MS switch
 
 ## Installation
 * Connect your Raspberry Pi Pico to the PC while holding down the BOOTSEL button.
