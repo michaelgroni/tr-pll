@@ -14,7 +14,7 @@
 
 ## Changes compared to the original user manual
 ### Memory channels
-* The memory channels are selected with thr main dial.
+* The memory channels are selected with the main dial.
 * Special memory channels, selected with the memory switch:
   * 1 Scanner start frequency
   * 2 Scanner stop frequency
