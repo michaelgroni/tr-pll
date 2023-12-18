@@ -20,6 +20,7 @@
   * 2 Scanner stop frequency
   * 3 to 5 not used (the same as 6 at the moment)
   * 6 normal operation
+  
   The special memory channels must be saved with the M button to take effect.
 
 ### Save and delete memory channels
