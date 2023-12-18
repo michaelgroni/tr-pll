@@ -14,14 +14,14 @@
 
 ## Changes compared to the original user manual
 ### Memory channels
-* The memory channels are selected with the main dial.
+* The memory channels are selected with the main dial. The switches for shift and CTCSS are irrelevant in memory mode (MR switch on).
 * Special memory channels, selected with the memory switch:
   * 1 Scanner start frequency
   * 2 Scanner stop frequency
   * 3 to 5 not used (the same as 6 at the moment)
   * 6 normal operation
-    
-The relay shift and a possibly set sub-tone are also saved. The switches for shift and CTCSS are irrelevant in memory mode (MR switch on).
+  The special memory channels must be saved with the M button to take effect.
+
 ### Save and delete memory channels
 Press the M button when in memory mode (MR switched on) and follow the instructions in the display.
 
