@@ -8,6 +8,7 @@
 ## Circuit diagrams
 ### CONTROL UNIT
 ![CONTROL UNIT](CONTROL.png)
+The CTCSS output can be connected directly to the FM modulator. The correct point is R15 / C17 / D1 on the DRIVE UNIT.
 
 ### PLL UNIT
 ![PLL UNIT](PLL.png)
